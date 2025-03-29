@@ -55,7 +55,7 @@ The tech server solutions website follows a modern web application architecture 
 - State management with React hooks
 - Form handling with controlled components
 - PDF generation for server configurations
-- Email form for sending configuration requests
+- Direct email system for sending configurations to sales
 - Clean separation between UI and business logic
 - TypeScript for type safety and better developer experience
 
@@ -64,8 +64,7 @@ The tech server solutions website follows a modern web application architecture 
 - **Home**: Hero section, featured categories, featured products
 - **Products**: Filtering sidebar, product grid, sorting options
 - **Product Detail**: Image, info, specs, related products
-- **Server Configuration**: Configuration list, PDF generation, email form
-- **Profile**: Account info with tabs
+- **Server Configuration**: Configuration interface, PDF generation, contact form
 
 ## Data Flow Patterns
 - API requests for data fetching
@@ -79,14 +78,14 @@ The tech server solutions website follows a modern web application architecture 
 ```
 ┌──────────────┐     ┌─────────────────┐     ┌───────────────────┐
 │  Customer    │     │  Configuration   │     │   PDF Generation  │
-│  Browses     │────►│  & Customization │────►│   & Email Form    │
+│  Browses     │────►│  & Customization │────►│   & Direct Email  │
 │  Products    │     │                  │     │                   │
 └──────────────┘     └─────────────────┘     └───────────────────┘
                                                        │
                                                        ▼
 ┌──────────────┐     ┌─────────────────┐     ┌───────────────────┐
 │  Sales Team  │     │  Customer       │     │   Configuration    │
-│  Contact     │◄────│  Details        │◄────│   Request          │
+│  Contact     │◄────│  Details        │◄────│   Submission       │
 │              │     │                  │     │                   │
 └──────────────┘     └─────────────────┘     └───────────────────┘
 ```
@@ -105,7 +104,6 @@ The tech server solutions website follows a modern web application architecture 
 - **Main Navigation:** 
   - Tech-focused mega menu with categories: Servers, Storage, Networking, Components
   - Secondary navigation for Corporate sections: About, Support, Configure Online
-  - User account and cart functionality in header
 - **Footer Navigation:**
   - Four-column layout with tech categories, corporate info, support, and contact
   - Social media links and newsletter signup
@@ -115,10 +113,9 @@ The tech server solutions website follows a modern web application architecture 
 - Home page
 - Category listing pages for server equipment
 - Product detail pages with technical specifications
-- Server configuration pages
+- Server configuration page
 - Corporate information pages
-- User account pages
-- Configuration request page with PDF generation and email form
+- Configuration submission page with PDF generation
 - Search results page
 
 ## UI Component Architecture
@@ -140,7 +137,7 @@ The tech server solutions website follows a modern web application architecture 
 - Technical document downloads associated with products
 - Configuration tools with dependency validation
 - Technical support information prominently displayed
-- Lead generation through PDF configurations and email forms
+- Lead generation through PDF configurations and direct email
 
 ## Data Flow Architecture
 
@@ -156,7 +153,7 @@ The tech server solutions website follows a modern web application architecture 
 - Server configuration details
 - Business requirements information
 - PDF generation capabilities
-- Email processing for sales team follow-up
+- Direct email delivery to sales team
 
 ## Frontend Architecture
 
@@ -164,39 +161,23 @@ The tech server solutions website follows a modern web application architecture 
 - Next.js 13 with App Router
 - React.js for component development
 - Tailwind CSS for styling
-- Authentication with Auth.js (NextAuth.js)
 
 ### Directory Structure
 ```
 frontend/
 ├── app/                    # Next.js App Router
 │   ├── api/                # API routes 
-│   │   └── auth/           # Authentication API endpoints
-│   ├── login/              # Login page
-│   ├── register/           # Registration page
-│   ├── profile/            # User profile page (protected)
-│   ├── cart/               # Server configuration page
+│   │   └── email/          # Email submission endpoint
+│   ├── configure/          # Server configuration page
 │   ├── products/           # Product listings
 │   └── page.tsx            # Homepage
 ├── components/             # Reusable components
-│   ├── layout/             # Layout components
-│   └── AuthProvider.tsx    # Authentication provider
+│   └── layout/             # Layout components
 ├── lib/                    # Utility functions
-│   └── auth.ts             # Authentication helpers
+│   └── pdf.ts              # PDF generation helpers
 ├── public/                 # Static assets
 └── types/                  # TypeScript type definitions
-    └── next-auth.d.ts      # NextAuth type extensions
 ```
-
-### Authentication System
-- **Provider:** Auth.js (NextAuth.js)
-- **Authentication Methods:**
-  - Credentials (email/password)
-  - OAuth (GitHub)
-- **Protected Routes:** Implemented with middleware
-- **User Roles:** Basic role-based access control (user/admin)
-- **Session Management:** JWT-based with server-side validation
-- **Mock Database:** For demonstration purposes
 
 ### Styling Approach
 - Tailwind CSS for utility-first styling
@@ -209,7 +190,6 @@ frontend/
 ### State Management
 - React hooks for local component state
 - React Context API for global state
-- NextAuth.js SessionProvider for auth state
 
 ## Backend Architecture
 
@@ -217,15 +197,13 @@ frontend/
 - Express.js based REST API
 - Node.js runtime
 - MongoDB for data persistence
-- JWT for API authentication
 
 ### API Endpoints
 ```
 /api/
-├── auth/           # Authentication endpoints
+├── email/          # Email submission endpoint
 ├── products/       # Product management
-├── configurations/ # Server configurations
-└── users/          # User management
+└── configurations/ # Server configurations
 ```
 
 ## Business Logic
@@ -240,80 +218,6 @@ frontend/
 - Component selection and compatibility checking
 - Configuration summary and price calculation
 - PDF generation for technical specifications
-- Email form for B2B inquiries
-
-### User Account System
-- Profile management for registered users
-- Server configuration history
-- B2B account request system
-- Role-based access control
-
-## PDF Generation and B2B Workflow
-
-### PDF Generation
-- Creates detailed specification documents for server configurations
-- Includes pricing information and component details
-- Branded with company logos and information
-- Downloadable for customer records
-
-### B2B Email Workflow
-- Collects business information through forms
-- Sends configuration details to sales team
-- Creates a database record of inquiry
-- Generates automated confirmation emails
-
-## Deployment Architecture
-
-### Docker Containerization
-- Frontend and backend in separate containers
-- MongoDB container for database
-- Nginx for reverse proxy and static serving
-- Docker Compose for local development
-
-### Scaling Considerations
-- Horizontal scaling for API servers
-- CDN integration for static assets
-- Database scaling with MongoDB replication
-- Caching layer for product data
-
-## Security Measures
-
-### Authentication
-- JWT-based authentication
-- Secure password handling with bcrypt
-- CSRF protection
-- Rate limiting for login attempts
-
-### Data Protection
-- HTTPS enforcement
-- Input validation and sanitization
-- XSS protection
-- API request validation
-
-## Testing Strategy
-
-### Test Levels
-- Unit testing with Jest
-- Integration testing with React Testing Library
-- E2E testing with Cypress
-- API testing with Supertest
-
-### Continuous Integration
-- GitHub Actions for CI/CD
-- Automated testing on pull requests
-- Code quality checks with ESLint and Prettier
-- Performance testing with Lighthouse
-
-## Performance Optimization
-
-### Frontend Optimizations
-- Server-side rendering for initial page load
-- Image optimization with Next.js Image component
-- Code splitting and lazy loading
-- Bundle size optimization
-
-### Backend Optimizations
-- Database query optimization
-- Response caching
-- Pagination for large data sets
-- Efficient API request batching
+- Direct email submission to sales team
+- Confirmation screen after submission
+- No account required for configuration
