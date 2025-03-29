@@ -1,6 +1,6 @@
 'use client';
 
-import Layout from '@/components/layout/Layout';
+import Layout from '../components/layout/Layout';
 import Link from 'next/link';
 import { ArrowRight, Server, Database, Network, Cpu, ExternalLink, Play, ChevronRight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ export default function HomePage() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/hero-bg.jpg"
+            src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31"
             alt="Data center"
             fill
             className="object-cover brightness-50"

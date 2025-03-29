@@ -3,7 +3,12 @@ const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   images: {
-    domains: ['localhost', 'images.example.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
   },
 };
 
