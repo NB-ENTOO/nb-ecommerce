@@ -157,3 +157,163 @@ The tech server solutions website follows a modern web application architecture 
 - Business requirements information
 - PDF generation capabilities
 - Email processing for sales team follow-up
+
+## Frontend Architecture
+
+### Core Framework
+- Next.js 13 with App Router
+- React.js for component development
+- Tailwind CSS for styling
+- Authentication with Auth.js (NextAuth.js)
+
+### Directory Structure
+```
+frontend/
+├── app/                    # Next.js App Router
+│   ├── api/                # API routes 
+│   │   └── auth/           # Authentication API endpoints
+│   ├── login/              # Login page
+│   ├── register/           # Registration page
+│   ├── profile/            # User profile page (protected)
+│   ├── cart/               # Server configuration page
+│   ├── products/           # Product listings
+│   └── page.tsx            # Homepage
+├── components/             # Reusable components
+│   ├── layout/             # Layout components
+│   └── AuthProvider.tsx    # Authentication provider
+├── lib/                    # Utility functions
+│   └── auth.ts             # Authentication helpers
+├── public/                 # Static assets
+└── types/                  # TypeScript type definitions
+    └── next-auth.d.ts      # NextAuth type extensions
+```
+
+### Authentication System
+- **Provider:** Auth.js (NextAuth.js)
+- **Authentication Methods:**
+  - Credentials (email/password)
+  - OAuth (GitHub)
+- **Protected Routes:** Implemented with middleware
+- **User Roles:** Basic role-based access control (user/admin)
+- **Session Management:** JWT-based with server-side validation
+- **Mock Database:** For demonstration purposes
+
+### Styling Approach
+- Tailwind CSS for utility-first styling
+- Mobile-first responsive design
+- Custom components for consistent UI/UX
+- Consistent color scheme based on blue/gray palette
+- Responsive megamenu for desktop navigation
+- Mobile sidebar menu for smaller screens
+
+### State Management
+- React hooks for local component state
+- React Context API for global state
+- NextAuth.js SessionProvider for auth state
+
+## Backend Architecture
+
+### API Structure
+- Express.js based REST API
+- Node.js runtime
+- MongoDB for data persistence
+- JWT for API authentication
+
+### API Endpoints
+```
+/api/
+├── auth/           # Authentication endpoints
+├── products/       # Product management
+├── configurations/ # Server configurations
+└── users/          # User management
+```
+
+## Business Logic
+
+### Server Product Catalog
+- Hierarchical category structure for server products
+- Search and filtering by technical specifications
+- Detailed product views with technical specifications
+- Related products and accessories
+
+### Server Configuration System
+- Component selection and compatibility checking
+- Configuration summary and price calculation
+- PDF generation for technical specifications
+- Email form for B2B inquiries
+
+### User Account System
+- Profile management for registered users
+- Server configuration history
+- B2B account request system
+- Role-based access control
+
+## PDF Generation and B2B Workflow
+
+### PDF Generation
+- Creates detailed specification documents for server configurations
+- Includes pricing information and component details
+- Branded with company logos and information
+- Downloadable for customer records
+
+### B2B Email Workflow
+- Collects business information through forms
+- Sends configuration details to sales team
+- Creates a database record of inquiry
+- Generates automated confirmation emails
+
+## Deployment Architecture
+
+### Docker Containerization
+- Frontend and backend in separate containers
+- MongoDB container for database
+- Nginx for reverse proxy and static serving
+- Docker Compose for local development
+
+### Scaling Considerations
+- Horizontal scaling for API servers
+- CDN integration for static assets
+- Database scaling with MongoDB replication
+- Caching layer for product data
+
+## Security Measures
+
+### Authentication
+- JWT-based authentication
+- Secure password handling with bcrypt
+- CSRF protection
+- Rate limiting for login attempts
+
+### Data Protection
+- HTTPS enforcement
+- Input validation and sanitization
+- XSS protection
+- API request validation
+
+## Testing Strategy
+
+### Test Levels
+- Unit testing with Jest
+- Integration testing with React Testing Library
+- E2E testing with Cypress
+- API testing with Supertest
+
+### Continuous Integration
+- GitHub Actions for CI/CD
+- Automated testing on pull requests
+- Code quality checks with ESLint and Prettier
+- Performance testing with Lighthouse
+
+## Performance Optimization
+
+### Frontend Optimizations
+- Server-side rendering for initial page load
+- Image optimization with Next.js Image component
+- Code splitting and lazy loading
+- Bundle size optimization
+
+### Backend Optimizations
+- Database query optimization
+- Response caching
+- Pagination for large data sets
+- Efficient API request batching
