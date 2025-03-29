@@ -5,6 +5,7 @@ WORKDIR /app
 COPY backend/package*.json ./
 
 RUN npm install
+RUN npm install -D @types/jsonwebtoken @types/bcrypt
 
 COPY backend/ .
 
