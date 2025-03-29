@@ -1,52 +1,84 @@
-# ETB Tech Replication - System Patterns
+# E-commerce Website - System Patterns
 
-## Architecture Overview
-The ETB Tech website replication will follow a modern web application architecture:
+## Implemented Architecture
+
+The e-commerce website follows a modern web application architecture with these implemented components:
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │                 │     │                 │     │                 │
-│  Client-side    │     │  Server-side    │     │    Database     │
-│    Frontend     │◄────┤     Backend     │◄────┤                 │
+│  Next.js        │     │  Express        │     │    MongoDB      │
+│  Frontend       │◄────┤     Backend     │◄────┤                 │
 │                 │     │                 │     │                 │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
-## Key Technical Decisions
+## Implemented Technical Patterns
 
 ### Frontend Architecture
-- Component-based UI architecture
-- Responsive design implementation using mobile-first approach
-- State management for shopping cart and user preferences
-- Client-side routing for seamless navigation
+- Next.js 13+ App Router for page organization and routing
+- Component-based UI architecture with React functional components
+- Responsive design implementation using Tailwind CSS
+- React hooks (useState, useEffect) for state management
+- Layout component pattern for consistent page structure
+- Mock data for development and testing
 
 ### Backend Architecture
-- RESTful API design for product management and e-commerce operations
-- Authentication and authorization system
-- Database abstraction layer
-- Middleware for logging, error handling, and request processing
+- RESTful API design with Express.js
+- MongoDB with Mongoose for data modeling and access
+- Controller-based architecture for request handling
+- Route organization by resource type
+- Environment-based configuration with dotenv
 
 ### Database Design
-- Product catalog schema
-- User account management
-- Order processing and history
-- Categories and filtering taxonomy
+- Mongoose schemas for data modeling
+- Product model with comprehensive fields for e-commerce
+- Timestamped documents for tracking creation and updates
+- Validation rules embedded in schemas
 
 ### Containerization Strategy
-- Docker-based development environment
-- Container composition for services
-- Volume mapping for persistence
-- Network configuration for service communication
+- Docker-based development environment with docker-compose
+- Separate containers for frontend, backend, and MongoDB
+- Volume mapping for code sync during development
+- Environment variable management for configuration
 
-### Design System
-- Component library for UI consistency
-- Shared styling variables and mixins
-- Responsive breakpoints system
-- Typography and spacing scales
+### Component Library
+- Layout components (Navbar, Footer, Layout)
+- Page-specific components organized by feature
+- Lucide React for consistent icon system
+- Tailwind CSS for styling with utility classes
+- Mobile-first responsive design approach
 
-## Implementation Guidelines
-- Follow responsive design principles throughout
-- Implement accessibility standards
-- Ensure cross-browser compatibility
-- Optimize for performance (lazy loading, code splitting)
-- Use semantic HTML for better SEO and accessibility 
+## Implementation Guidelines (Applied)
+- Responsive design with mobile-first approach
+- Component reusability across pages
+- State management with React hooks
+- Form handling with controlled components
+- Multi-step processes with state transitions
+- Clean separation between UI and business logic
+- TypeScript for type safety and better developer experience
+
+## Page Structure
+- **Layout**: Common structure with Navbar and Footer
+- **Home**: Hero section, featured categories, featured products
+- **Products**: Filtering sidebar, product grid, sorting options
+- **Product Detail**: Image, info, specs, related products
+- **Cart**: Line items, quantity controls, order summary
+- **Checkout**: Multi-step process (shipping, payment, review)
+- **Profile**: Account info, order history with tabs
+
+## Data Flow Patterns
+- API requests for data fetching
+- Form state management for user input
+- Local state for UI interactions
+- Conditional rendering based on state
+- Mock data for development and testing
+- Error handling for API failures
+
+## State Management Approach
+- React hooks for component-level state
+- useState for simple state management
+- useEffect for side effects and data fetching
+- Props for component communication
+- Form state for user input
+- Local component state for UI interactions 

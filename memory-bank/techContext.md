@@ -1,64 +1,89 @@
-# ETB Tech Replication - Technology Context
+# E-commerce Website - Technology Context
 
-## Proposed Technology Stack
+## Implemented Technology Stack
 
 ### Frontend
-- **Framework**: Next.js (React-based framework)
-- **Styling**: Tailwind CSS with custom components
-- **State Management**: React Context API + hooks / Redux Toolkit
-- **Data Fetching**: React Query / SWR
-- **Form Handling**: React Hook Form with Yup validation
-- **UI Components**: Custom components inspired by original design
+- **Framework**: Next.js 13+ with App Router
+- **UI Library**: React 18+
+- **Styling**: Tailwind CSS 
+- **Icons**: Lucide React
+- **Type Safety**: TypeScript
 
 ### Backend
-- **Framework**: Node.js with Express
-- **API**: RESTful endpoints
-- **Authentication**: JWT-based authentication
-- **Validation**: Joi / Zod
-- **Database ORM**: Prisma / Mongoose (depending on database choice)
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **API Style**: RESTful
+- **Data Validation**: Built-in Express middleware
 
 ### Database
-- **Primary Database**: MongoDB (NoSQL) / PostgreSQL (SQL)
-- **Caching**: Redis (optional for performance)
+- **Type**: MongoDB NoSQL database
+- **ODM**: Mongoose for schema definition and validation
+- **Models**: Products, Users (planned)
 
-### DevOps
-- **Containerization**: Docker
-- **Container Orchestration**: Docker Compose
-- **Version Control**: Git
-- **CI/CD**: GitHub Actions (optional)
+### Infrastructure
+- **Containerization**: Docker with docker-compose
+- **Development Environment**: Local containers
+- **Services**: Frontend, Backend, MongoDB
 
 ## Development Environment
 
-### Required Software
-- Node.js (LTS version)
-- Docker Desktop
-- Git
-- Code editor (VS Code recommended)
-- Browser developer tools
+### Setup Requirements
+- Node.js and npm
+- Docker and docker-compose
+- Git version control
+- Code editor with TypeScript support
 
-### Setup Process
-1. Clone repository
-2. Install dependencies
-3. Set up environment variables
-4. Run Docker Compose
-5. Initialize database
-6. Start development server
+### Local Development
+- Next.js development server with hot-reloading
+- Express API server with auto-restart
+- MongoDB container with volume persistence
+- Environment variables for configuration
 
-## Development Workflow
-- Feature-based branching strategy
-- Component-first development approach
-- Mobile-first responsive design implementation
-- Iterative development of features
+## File Organization
+
+### Frontend Structure
+```
+frontend/
+├── app/                  # Next.js App Router pages
+│   ├── products/         # Product pages
+│   ├── cart/             # Shopping cart
+│   └── checkout/         # Checkout process
+├── components/           # Reusable React components
+│   ├── layout/           # Layout components
+│   └── ui/               # UI components 
+├── public/               # Static assets
+└── app.globals.css       # Global styles
+```
+
+### Backend Structure
+```
+backend/
+├── src/
+│   ├── controllers/      # Request handlers
+│   ├── models/           # Database schemas
+│   ├── routes/           # API endpoints
+│   └── server.ts         # Express application
+└── .env                  # Environment variables
+```
 
 ## Testing Strategy
+
+### Planned Testing Approach
+- Unit testing with Jest
 - Component testing with React Testing Library
 - API testing with Supertest
-- E2E testing with Cypress (optional)
-- Responsive testing across device sizes
+- End-to-end testing with Cypress
 
 ## Performance Considerations
-- Image optimization
-- Code splitting
-- Lazy loading
-- Server-side rendering for improved SEO
-- Static generation where appropriate 
+
+### Implemented Optimizations
+- Server-side rendering with Next.js
+- Code splitting for page routes
+- Mobile-first responsive design
+- Lazy loading for images (Next/Image)
+
+### Planned Optimizations
+- API response caching
+- Database query optimization
+- Asset compression and minification
+- CDN integration for static assets 
