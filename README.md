@@ -1,98 +1,98 @@
-# E-Commerce Website
+# E-Commerce Web Application
 
-A modern e-commerce application with a React/Next.js frontend and a Node.js/Express backend.
+A fully functional e-commerce web application built with Next.js, Express, MongoDB, and Docker.
 
 ## Features
 
-- Responsive design with mobile-first approach
-- Product listings with filtering and sorting capabilities
-- Detailed product pages
-- Shopping cart functionality
-- User profiles and order history
-- Checkout flow with multiple steps
+- Modern, responsive UI built with Next.js and Tailwind CSS
+- Comprehensive admin panel for product, user, and order management
+- RESTful API with Express and MongoDB
+- Containerized with Docker for easy deployment
 
-## Tech Stack
+## Prerequisites
 
-### Frontend
-- Next.js 13 (with App Router)
-- React 18
-- TypeScript
-- Tailwind CSS
-- Lucide React for icons
-
-### Backend
-- Node.js
-- Express
-- MongoDB with Mongoose
-- Docker for containerization
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
 ## Getting Started
 
-### Prerequisites
-- Node.js 16+
-- Docker and Docker Compose
+### Running with Docker
 
-### Running the Backend
-1. Navigate to the backend directory:
+1. Clone the repository:
    ```
-   cd backend
+   git clone <repository-url>
+   cd e-commerce
    ```
 
-2. Install dependencies:
+2. Start the application using Docker Compose:
    ```
-   npm install
+   docker-compose up
    ```
 
-3. Create a `.env` file based on `.env.example`
+   This will start three containers:
+   - MongoDB (database)
+   - Express backend (API)
+   - Next.js frontend (UI)
 
-4. Start the backend services with Docker:
+3. Access the application:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
+   - Admin Panel: http://localhost:3000/admin
+
+4. To run in detached mode:
    ```
    docker-compose up -d
    ```
 
-5. Run the development server:
+5. To stop the containers:
    ```
+   docker-compose down
+   ```
+
+### Development Setup (without Docker)
+
+1. Start MongoDB locally or use MongoDB Atlas.
+
+2. Configure backend:
+   ```
+   cd backend
+   cp .env.example .env
+   # Edit .env file with your MongoDB connection string
+   npm install
    npm run dev
    ```
-   The API will be available at http://localhost:5000
 
-### Running the Frontend
-1. Navigate to the frontend directory:
+3. Configure frontend:
    ```
    cd frontend
-   ```
-
-2. Install dependencies:
-   ```
    npm install
-   ```
-
-3. Run the development server:
-   ```
    npm run dev
    ```
-   The website will be available at http://localhost:3000
 
-## Project Structure
+4. Access the application:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
 
-```
-├── backend/                # Node.js/Express API
-│   ├── src/
-│   │   ├── config/         # Configuration files
-│   │   ├── controllers/    # Request handlers
-│   │   ├── models/         # Mongoose models
-│   │   ├── routes/         # API routes
-│   │   └── server.ts       # Express app
-│   ├── Dockerfile          # Backend Docker configuration
-│   └── package.json        # Backend dependencies
-│
-├── frontend/               # Next.js application
-│   ├── app/                # Next.js app router
-│   ├── components/         # React components
-│   │   ├── layout/         # Layout components (header, footer)
-│   │   └── ui/             # Reusable UI components
-│   ├── public/             # Static assets
-│   └── package.json        # Frontend dependencies
-│
-└── docker-compose.yml      # Docker services configuration
-``` 
+## Admin Access
+
+The admin panel can be accessed at http://localhost:3000/admin
+
+Default admin credentials:
+- Email: admin@example.com
+- Password: password123
+
+## Architecture
+
+- **Frontend**: Next.js, React, Tailwind CSS
+- **Backend**: Express, TypeScript
+- **Database**: MongoDB
+- **Authentication**: JWT
+- **Deployment**: Docker, Docker Compose
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request 

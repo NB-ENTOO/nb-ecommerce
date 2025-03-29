@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 
 // Import routes
 import productRoutes from './routes/productRoutes';
+import authRoutes from './routes/authRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -24,6 +25,7 @@ app.get('/', (req: Request, res: Response) => {
 
 // API routes
 app.use('/api/products', productRoutes);
+app.use('/api/auth', authRoutes);
 
 // Start server
 app.listen(port, () => {
