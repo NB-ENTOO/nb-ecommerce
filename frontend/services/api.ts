@@ -91,4 +91,18 @@ export async function submitConfiguration(configuration: {
     throw new Error('Failed to submit configuration');
   }
   return response.json();
-} 
+}
+
+export async function fetchCategories(): Promise<{ categories: string[] }> {
+  await new Promise(resolve => setTimeout(resolve, 50));
+
+  const categories = [
+    'Servers',
+    'Storage',
+    'Networking',
+    'Components',
+    'Accessories',
+  ];
+
+  return { categories };
+}

@@ -1,245 +1,271 @@
-import React, { useState, useEffect } from 'react';
-import { IProduct, IConfigurationGroup, IConfigurationOption, IWarrantyUpgrade, ISupportUpgrade } from '@/types/product';
+import React, { useReducer, useCallback, useEffect } from 'react';
+import {
+  IProduct,
+  IWarrantyUpgrade,
+  ISupportUpgrade,
+  IPrice
+} from '@/types/product';
 import { Card } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { calculateTotalPrice, calculateBuildTime, formatPrice, getPriceInCurrency } from '@/utils/price';
-import { validateQuoteSubmission, ValidationError } from '@/utils/validation';
+import { formatPrice } from '@/lib/utils';
 import CurrencySelector from '@/components/common/CurrencySelector';
 
+// --- Helper Functions (Adjusted for IProduct type) ---
+
+// Helper to get price in selected currency from an IPrice array (used by potential upgrades)
+function getPriceInCurrency(prices: IPrice[], currency: 'USD' | 'GBP' | 'EUR'): number {
+  const priceObj = prices.find((p) => p.currency === currency);
+  return priceObj ? priceObj.amount : 0;
+}
+
+// Type for the structure within product.configurationOptions
+type ProductConfigGroup = {
+  name: string;
+  options: Array<{ value: string; label: string; priceModifier: number; }>;
+  required: boolean;
+};
+
+// Helper to calculate total price based on selected options and modifiers
+function calculateTotalPriceInternal(
+  basePrice: number,
+  selectedOptions: Record<string, string>,
+  configOptions: { [key: string]: ProductConfigGroup } // Use the object type
+): number {
+  let total = basePrice;
+  // Iterate over the configuration *object*
+  for (const groupKey in configOptions) {
+    const group = configOptions[groupKey];
+    const selectedValue = selectedOptions[group.name]; // Use group.name to match selectedOptions keys
+    if (selectedValue) {
+      const selectedOpt = group.options.find((opt) => opt.value === selectedValue);
+      // Use priceModifier
+      if (selectedOpt && selectedOpt.priceModifier) {
+        total += selectedOpt.priceModifier;
+      }
+    }
+  }
+  return total;
+}
+
+// Validation Error Type
+interface ValidationError {
+  field: string;
+  message: string;
+}
+
+// Helper for validation, adapted for configurationOptions object type
+function validateConfigurationInternal(
+  selectedOptions: Record<string, string>,
+  configOptions: { [key: string]: ProductConfigGroup } // Use the object type
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+  // Iterate over the configuration *object*
+  for (const groupKey in configOptions) {
+      const group = configOptions[groupKey];
+      if (group.required && !selectedOptions[group.name]) {
+          errors.push({ field: group.name, message: `${group.name} is required.` });
+      }
+  }
+  // TODO: Add more validation if needed (e.g., check stock, though stock isn't in this type structure)
+  return errors;
+}
+
+// --- Reducer Logic (Simplified: removed buildTime, warranty/support price logic) ---
+
+type ConfigurationState = {
+  selectedCurrency: 'USD' | 'GBP' | 'EUR'; // Assuming base price currency matches this
+  selectedOptions: Record<string, string>;
+  totalPrice: number;
+  errors: ValidationError[];
+};
+
+type ConfigurationAction =
+  | { type: 'UPDATE_CURRENCY'; payload: 'USD' | 'GBP' | 'EUR' }
+  | { type: 'UPDATE_OPTION'; payload: { groupName: string; value: string } }
+  | { type: 'SET_ERRORS'; payload: ValidationError[] }
+  | { type: 'CALCULATE_TOTALS'; payload: { product: IProduct } };
+
+function configurationReducer(state: ConfigurationState, action: ConfigurationAction): ConfigurationState {
+  switch (action.type) {
+    case 'UPDATE_CURRENCY':
+        // NOTE: Base price currency in IProduct isn't necessarily linked to this.
+        // Recalculation needed if prices are currency-dependent.
+      return { ...state, selectedCurrency: action.payload, errors: [] };
+    case 'UPDATE_OPTION':
+      return {
+        ...state,
+        selectedOptions: {
+          ...state.selectedOptions,
+          [action.payload.groupName]: action.payload.value,
+        },
+        errors: [],
+      };
+    case 'SET_ERRORS':
+      return { ...state, errors: action.payload };
+    case 'CALCULATE_TOTALS': {
+      const { product } = action.payload;
+      // Use base price directly. Assume it corresponds to selectedCurrency or handle conversion if needed.
+      const basePrice = product.prices.base;
+
+      let optionTotal = calculateTotalPriceInternal(
+        basePrice,
+        state.selectedOptions,
+        product.configurationOptions // Pass the object
+      );
+
+      return {
+        ...state,
+        totalPrice: optionTotal,
+      };
+    }
+    default:
+      return state;
+  }
+}
+
+// --- Component --- (Interface updated)
 interface ConfigurationBuilderProps {
   product: IProduct;
   onAddToQuote: (configuration: {
     productId: string;
     selectedOptions: Record<string, string>;
-    warranty: string | null;
-    support: string | null;
     totalPrice: number;
-    currency: 'USD' | 'GBP' | 'EUR';
-    buildTime: number;
+    currency: string; // Use product's base currency or selected if conversion happens
   }) => void;
 }
 
 export default function ConfigurationBuilder({ product, onAddToQuote }: ConfigurationBuilderProps) {
-  const [selectedCurrency, setSelectedCurrency] = useState<'USD' | 'GBP' | 'EUR'>('USD');
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
-  const [selectedWarranty, setSelectedWarranty] = useState<string | null>(null);
-  const [selectedSupport, setSelectedSupport] = useState<string | null>(null);
-  const [totalPrice, setTotalPrice] = useState<number>(0);
-  const [buildTime, setBuildTime] = useState<number>(product.customization.buildTime);
-  const [errors, setErrors] = useState<ValidationError[]>([]);
 
+  const initialState: ConfigurationState = {
+    selectedCurrency: 'USD', // Default UI selector, may not match product.prices.currency
+    selectedOptions: {},
+    totalPrice: product.prices.base, // Initial price from product
+    errors: [],
+  };
+
+  const [state, dispatch] = useReducer(configurationReducer, initialState);
+
+  // Recalculate totals whenever options change (currency change might require more logic)
   useEffect(() => {
-    try {
-      const basePrice = getPriceInCurrency(product.prices, selectedCurrency);
-      const total = calculateTotalPrice(
-        basePrice,
-        selectedOptions,
-        product.configurationOptions,
-        selectedCurrency
-      );
-      setTotalPrice(total);
+    dispatch({ type: 'CALCULATE_TOTALS', payload: { product } });
+  // Only re-calculate when options change, as currency/warranty/support don't affect price calculation now
+  }, [state.selectedOptions, product]);
 
-      const time = calculateBuildTime(
-        product.customization.buildTime,
-        selectedOptions,
-        product.configurationOptions
-      );
-      setBuildTime(time);
-    } catch (error) {
-      console.error('Error calculating price:', error);
-    }
-  }, [selectedOptions, selectedCurrency, product]);
+  const handleCurrencyChange = useCallback((value: 'USD' | 'GBP' | 'EUR') => {
+     dispatch({ type: 'UPDATE_CURRENCY', payload: value });
+     // Note: This currently only changes the display format via formatPrice,
+     // it doesn't recalculate prices based on currency unless helpers are adjusted
+  }, []);
 
-  const handleOptionChange = (groupName: string, value: string) => {
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [groupName]: value,
-    }));
-  };
+  const handleOptionChange = useCallback((groupName: string, value: string) => {
+    // Allow deselecting non-required options by selecting empty string
+    const newValue = value === "" ? undefined : value;
+    dispatch({ type: 'UPDATE_OPTION', payload: { groupName, value: newValue ?? "" } });
+  }, []);
 
-  const handleWarrantyChange = (value: string) => {
-    setSelectedWarranty(value);
-  };
-
-  const handleSupportChange = (value: string) => {
-    setSelectedSupport(value);
-  };
-
-  const handleAddToQuote = () => {
-    const validationErrors = validateQuoteSubmission(
-      selectedOptions,
-      product.configurationOptions,
-      selectedWarranty,
-      product.warranty.upgradeOptions || [],
-      selectedSupport,
-      product.support.upgradeOptions || []
+  const handleAddToQuote = useCallback(() => {
+    const validationErrors = validateConfigurationInternal(
+      state.selectedOptions,
+      product.configurationOptions // Pass the object
     );
 
     if (validationErrors.length > 0) {
-      setErrors(validationErrors);
+      dispatch({ type: 'SET_ERRORS', payload: validationErrors });
       return;
     }
 
+    // Updated configuration object matching the prop type
     const configuration = {
       productId: product._id,
-      selectedOptions,
-      warranty: selectedWarranty,
-      support: selectedSupport,
-      totalPrice,
-      currency: selectedCurrency,
-      buildTime,
+      selectedOptions: state.selectedOptions,
+      totalPrice: state.totalPrice,
+      currency: product.prices.currency, // Use the currency defined in the product data
     };
 
     onAddToQuote(configuration);
-  };
+  }, [state, product, onAddToQuote]);
 
   return (
     <div className="space-y-6">
-      {/* Currency Selector */}
-      <Card className="p-4">
+      {/* Currency Selector - Note: Only affects display format currently */}
+      {/* <Card className="p-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Select Currency:</span>
-          <CurrencySelector value={selectedCurrency} onChange={setSelectedCurrency} />
+          <span className="text-sm font-medium">Display Currency:</span>
+          <CurrencySelector value={state.selectedCurrency} onChange={handleCurrencyChange} />
         </div>
-      </Card>
+      </Card> */}
 
-      {/* Configuration Options */}
-      {product.configurationOptions
-        .sort((a: IConfigurationGroup, b: IConfigurationGroup) => a.sortOrder - b.sortOrder)
-        .map((group: IConfigurationGroup) => (
-          <Card key={group.name} className="p-4">
+      {/* Configuration Options - Iterate over object */}
+      {Object.entries(product.configurationOptions)
+        // .sort(...) // Cannot sort object directly. Sort keys if needed: Object.keys(product.configurationOptions).sort(...).map(key => [key, product.configurationOptions[key]])
+        .map(([groupKey, group]: [string, ProductConfigGroup]) => (
+          <Card key={groupKey} className="p-4">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium">{group.name}</h3>
-                  <p className="text-sm text-muted-foreground">{group.description}</p>
+                  {/* <p className="text-sm text-muted-foreground">{group.description}</p> // Description not in type */}
                 </div>
                 {group.required && <Badge variant="secondary">Required</Badge>}
               </div>
 
               <Select
-                value={selectedOptions[group.name] || ''}
+                value={state.selectedOptions[group.name] || ''}
                 onValueChange={(value) => handleOptionChange(group.name, value)}
+                required={group.required}
               >
                 <SelectTrigger>
                   <SelectValue placeholder={`Select ${group.name}`} />
                 </SelectTrigger>
                 <SelectContent>
-                  {group.options.map((option: IConfigurationOption) => (
+                  {/* Add a None option if not required */}
+                  {!group.required && (
+                     <SelectItem value="">None</SelectItem>
+                  )}
+                  {group.options.map((option) => (
                     <SelectItem
-                      key={option.value}
+                      key={option.value} // Assuming option.value is unique identifier
                       value={option.value}
-                      disabled={option.stock === 0}
+                      // disabled={option.stock === 0} // Stock info not in type
                     >
                       <div className="flex items-center justify-between w-full">
-                        <span>{option.value}</span>
+                        {/* Use label from type */}
+                        <span>{option.label}</span>
                         <div className="flex items-center gap-2">
-                          {option.price > 0 && (
+                          {/* Use priceModifier */}
+                          {option.priceModifier !== 0 && (
                             <span className="text-sm text-muted-foreground">
-                              +{formatPrice(option.price, selectedCurrency)}
+                              {option.priceModifier > 0 ? '+' : ''}{formatPrice(option.priceModifier, product.prices.currency)} {/* Use product currency */}
                             </span>
                           )}
-                          {option.stock === 0 && (
-                            <Badge variant="destructive">Out of Stock</Badge>
-                          )}
-                          {option.stock > 0 && option.stock <= 5 && (
-                            <Badge variant="warning">Low Stock</Badge>
-                          )}
+                          {/* Stock badges removed */}
                         </div>
                       </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+               {state.errors.find(e => e.field === group.name) && (
+                 <p className="text-sm text-destructive">
+                   {state.errors.find(e => e.field === group.name)?.message}
+                 </p>
+               )}
             </div>
           </Card>
         ))}
 
-      {/* Warranty Options */}
-      {product.warranty.upgradeable && product.warranty.upgradeOptions && (
-        <Card className="p-4">
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-medium">Warranty Upgrade</h3>
-              <p className="text-sm text-muted-foreground">
-                Extend your warranty coverage
-              </p>
-            </div>
-
-            <Select
-              value={selectedWarranty || ''}
-              onValueChange={handleWarrantyChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Warranty Upgrade" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Standard Warranty</SelectItem>
-                {product.warranty.upgradeOptions.map((option: IWarrantyUpgrade) => (
-                  <SelectItem key={option.type} value={option.type}>
-                    <div className="flex items-center justify-between w-full">
-                      <span>
-                        {option.duration} {option.unit} - {option.type}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        +{formatPrice(getPriceInCurrency(option.price, selectedCurrency), selectedCurrency)}
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </Card>
-      )}
-
-      {/* Support Options */}
-      {product.support.upgradeOptions && (
-        <Card className="p-4">
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-medium">Support Upgrade</h3>
-              <p className="text-sm text-muted-foreground">
-                Enhance your support package
-              </p>
-            </div>
-
-            <Select
-              value={selectedSupport || ''}
-              onValueChange={handleSupportChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Support Upgrade" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Standard Support</SelectItem>
-                {product.support.upgradeOptions.map((option: ISupportUpgrade) => (
-                  <SelectItem key={option.type} value={option.type}>
-                    <div className="flex items-center justify-between w-full">
-                      <span>
-                        {option.hours} hours - {option.type}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        +{formatPrice(getPriceInCurrency(option.price, selectedCurrency), selectedCurrency)}
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </Card>
-      )}
+      {/* Warranty Options Section Removed */}
+      {/* Support Options Section Removed */}
 
       {/* Error Messages */}
-      {errors.length > 0 && (
+      {state.errors.length > 0 && (
         <Alert variant="destructive">
           <AlertDescription>
             <ul className="list-disc pl-4">
-              {errors.map((error, index) => (
+              {state.errors.map((error, index) => (
                 <li key={index}>{error.message}</li>
               ))}
             </ul>
@@ -247,28 +273,21 @@ export default function ConfigurationBuilder({ product, onAddToQuote }: Configur
         </Alert>
       )}
 
-      {/* Summary */}
-      <Card className="p-4">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="font-medium">Total Price:</span>
-            <span className="text-2xl font-bold">
-              {formatPrice(totalPrice, selectedCurrency)}
-            </span>
+      {/* Summary Card (Build time removed) */}
+      <Card className="p-4 bg-muted/40">
+        <div className="space-y-3">
+          {/* Build time removed */}
+          <div className="flex justify-between items-center text-xl font-bold">
+            <span>Total Price:</span>
+            {/* Format using product's currency */}
+            <span>{formatPrice(state.totalPrice, product.prices.currency)}</span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="font-medium">Estimated Build Time:</span>
-            <span>{buildTime} hours</span>
-          </div>
-          <Button
-            className="w-full"
-            onClick={handleAddToQuote}
-            disabled={errors.length > 0}
-          >
-            Add to Quote
-          </Button>
         </div>
       </Card>
+
+      <Button onClick={handleAddToQuote} size="lg" className="w-full">
+        Add to Quote
+      </Button>
     </div>
   );
 } 

@@ -1,87 +1,95 @@
-'use client';
-
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { ProductFilter } from '@/components/products/ProductFilter';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { fetchProducts } from '@/services/api';
+import { fetchProducts, fetchCategories } from '@/services/api';
 import { IProduct } from '@/types/product';
-import { useEffect } from 'react';
+import { Suspense } from 'react';
 
-export default function ProductsPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [products, setProducts] = useState<IProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [categories] = useState([
-    'Servers',
-    'Storage',
-    'Networking',
-    'Components',
-    'Accessories',
+export default async function ProductsPage({ searchParams }: {
+  searchParams?: { [key: string]: string | string | undefined };
+}) {
+  const search = searchParams?.search as string | undefined;
+  const category = searchParams?.category as string | undefined;
+  const sort = searchParams?.sort as string | undefined;
+
+  const [productsData, categoriesData] = await Promise.all([
+    fetchProducts({ search, category, sort }).catch((err: unknown) => {
+      console.error('Failed to fetch products:', err);
+      return { products: [], total: 0, error: 'Failed to load products. Please try again later.' };
+    }),
+    fetchCategories().catch((err: unknown) => {
+      console.error('Failed to fetch categories:', err);
+      return { categories: ['Servers', 'Storage', 'Networking', 'Components', 'Accessories'], error: 'Failed to load categories.' };
+    })
   ]);
 
-  const loadProducts = async (filters: {
-    search?: string;
-    category?: string;
-    sort?: string;
-  }) => {
-    try {
-      setLoading(true);
-      setError('');
-      const { products } = await fetchProducts(filters);
-      setProducts(products);
-    } catch (err) {
-      setError('Failed to load products. Please try again later.');
-      console.error('Error loading products:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Type guard to check for error property
+  function hasError<T>(obj: T | (T & { error: string })): obj is T & { error: string } {
+    return typeof obj === 'object' && obj !== null && 'error' in obj;
+  }
 
-  useEffect(() => {
-    const search = searchParams.get('search') || undefined;
-    const category = searchParams.get('category') || undefined;
-    const sort = searchParams.get('sort') || undefined;
-    loadProducts({ search, category, sort });
-  }, [searchParams]);
+  // Handle potential errors from fetching
+  if (hasError(productsData)) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <h1 className="text-3xl font-bold mb-8">Products</h1>
+        {/* Render filter even on error */}
+        <ProductFilter
+          categories={hasError(categoriesData) ? [] : categoriesData.categories}
+          initialSearch={search}
+          initialCategory={category}
+          initialSort={sort}
+        />
+        <div className="mt-8">
+          <ErrorMessage message={productsData.error} />
+        </div>
+      </div>
+    );
+  }
 
-  const handleFilterChange = (filters: {
-    search?: string;
-    category?: string;
-    sort?: string;
-  }) => {
-    const params = new URLSearchParams();
-    if (filters.search) params.set('search', filters.search);
-    if (filters.category) params.set('category', filters.category);
-    if (filters.sort) params.set('sort', filters.sort);
-    router.push(`/products?${params.toString()}`);
-  };
+  // If categories fetch failed, log it but continue with fallback
+  if (hasError(categoriesData)) {
+    console.warn(categoriesData.error);
+    // Use fallback categories if fetch failed
+    const fallbackCategories = ['Servers', 'Storage', 'Networking', 'Components', 'Accessories'];
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <h1 className="text-3xl font-bold mb-8">Products</h1>
+        <ProductFilter
+          categories={fallbackCategories}
+          initialSearch={search}
+          initialCategory={category}
+          initialSort={sort}
+        />
+        <div className="mt-8">
+          {productsData.products.length > 0 ? (
+            <ProductGrid products={productsData.products} />
+          ) : (
+            <p className="text-center text-muted-foreground">No products found matching your criteria.</p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
+  // If both fetches were successful
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-8">Products</h1>
       <ProductFilter
-        onFilterChange={handleFilterChange}
-        categories={categories}
+        categories={categoriesData.categories} // Now known to not have error
+        initialSearch={search}
+        initialCategory={category}
+        initialSort={sort}
       />
-      {error && (
-        <div className="mt-8">
-          <ErrorMessage message={error} />
-        </div>
-      )}
-      {loading ? (
-        <div className="flex h-[400px] items-center justify-center">
-          <LoadingSpinner size="lg" />
-        </div>
-      ) : (
-        <div className="mt-8">
-          <ProductGrid products={products} />
-        </div>
-      )}
+      <div className="mt-8">
+        {productsData.products.length > 0 ? (
+          <ProductGrid products={productsData.products} /> // Now known to not have error
+        ) : (
+          <p className="text-center text-muted-foreground">No products found matching your criteria.</p>
+        )}
+      </div>
     </div>
   );
 } 

@@ -12,20 +12,6 @@ export function formatPrice(price: number, currency: string = 'USD'): string {
   }).format(price);
 }
 
-export function generateSKU(category: string, id: string): string {
-  return `${category.toUpperCase()}-${id}`;
-}
-
-export function slugify(text: string): string {
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-');
-}
-
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
