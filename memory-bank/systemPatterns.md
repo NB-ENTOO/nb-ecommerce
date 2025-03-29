@@ -2,7 +2,7 @@
 
 ## Implemented Architecture
 
-The e-commerce website follows a modern web application architecture with these implemented components:
+The tech server solutions website follows a modern web application architecture with these implemented components:
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -32,7 +32,7 @@ The e-commerce website follows a modern web application architecture with these 
 
 ### Database Design
 - Mongoose schemas for data modeling
-- Product model with comprehensive fields for e-commerce
+- Product model with comprehensive fields for server equipment
 - Timestamped documents for tracking creation and updates
 - Validation rules embedded in schemas
 
@@ -54,7 +54,8 @@ The e-commerce website follows a modern web application architecture with these 
 - Component reusability across pages
 - State management with React hooks
 - Form handling with controlled components
-- Multi-step processes with state transitions
+- PDF generation for server configurations
+- Email form for sending configuration requests
 - Clean separation between UI and business logic
 - TypeScript for type safety and better developer experience
 
@@ -63,9 +64,8 @@ The e-commerce website follows a modern web application architecture with these 
 - **Home**: Hero section, featured categories, featured products
 - **Products**: Filtering sidebar, product grid, sorting options
 - **Product Detail**: Image, info, specs, related products
-- **Cart**: Line items, quantity controls, order summary
-- **Checkout**: Multi-step process (shipping, payment, review)
-- **Profile**: Account info, order history with tabs
+- **Server Configuration**: Configuration list, PDF generation, email form
+- **Profile**: Account info with tabs
 
 ## Data Flow Patterns
 - API requests for data fetching
@@ -74,6 +74,22 @@ The e-commerce website follows a modern web application architecture with these 
 - Conditional rendering based on state
 - Mock data for development and testing
 - Error handling for API failures
+
+## Business Model Flow
+```
+┌──────────────┐     ┌─────────────────┐     ┌───────────────────┐
+│  Customer    │     │  Configuration   │     │   PDF Generation  │
+│  Browses     │────►│  & Customization │────►│   & Email Form    │
+│  Products    │     │                  │     │                   │
+└──────────────┘     └─────────────────┘     └───────────────────┘
+                                                       │
+                                                       ▼
+┌──────────────┐     ┌─────────────────┐     ┌───────────────────┐
+│  Sales Team  │     │  Customer       │     │   Configuration    │
+│  Contact     │◄────│  Details        │◄────│   Request          │
+│              │     │                  │     │                   │
+└──────────────┘     └─────────────────┘     └───────────────────┘
+```
 
 ## State Management Approach
 - React hooks for component-level state
@@ -102,7 +118,7 @@ The e-commerce website follows a modern web application architecture with these 
 - Server configuration pages
 - Corporate information pages
 - User account pages
-- Checkout process
+- Configuration request page with PDF generation and email form
 - Search results page
 
 ## UI Component Architecture
@@ -114,6 +130,8 @@ The e-commerce website follows a modern web application architecture with these 
 - **CompatibilityChecker:** Tool to verify component compatibility
 - **NetworkDiagram:** Visual configuration of network equipment
 - **StorageSizer:** Calculator for storage requirements
+- **PDFGenerator:** Component to create PDF of server configurations
+- **ConfigurationRequestForm:** Form for customers to submit contact information
 
 ### Tech E-commerce Patterns
 - Server product displays emphasize technical specifications over visual appeal
@@ -122,6 +140,7 @@ The e-commerce website follows a modern web application architecture with these 
 - Technical document downloads associated with products
 - Configuration tools with dependency validation
 - Technical support information prominently displayed
+- Lead generation through PDF configurations and email forms
 
 ## Data Flow Architecture
 
@@ -131,3 +150,10 @@ The e-commerce website follows a modern web application architecture with these 
 - Hierarchical categorization by technical capabilities
 - Configuration options and dependencies
 - Warranty and support package information
+
+### Configuration Request Model
+- Customer contact information
+- Server configuration details
+- Business requirements information
+- PDF generation capabilities
+- Email processing for sales team follow-up
