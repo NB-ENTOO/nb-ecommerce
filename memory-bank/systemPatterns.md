@@ -221,3 +221,330 @@ frontend/
 - Direct email submission to sales team
 - Confirmation screen after submission
 - No account required for configuration
+
+## Database Seeding and Docker Containerization Plans
+
+### Database Seeding Strategy
+- JSON-based seed data files
+- Seeding scripts run during initialization
+- Development vs production data sets
+- Compatibility validation during seeding
+- Realistic data model for testing
+
+### Containerization Strategy
+- Multi-container architecture with Docker Compose
+- Volume mounting for persistence
+- Environment variable configuration
+- Container health checks
+- Production vs development configurations
+- Network configuration between containers
+
+## Architecture Overview
+
+### Core Components
+
+- **Frontend**: Next.js application with React components
+  - App Router architecture for page routing
+  - Component-based UI structure
+  - TypeScript for type safety
+  - Tailwind CSS for styling
+  - Custom hooks for state management
+  - Responsive design using CSS media queries
+
+- **Backend**: Express.js REST API
+  - Controller-based architecture
+  - Mongoose for MongoDB interaction
+  - Route-specific middleware pattern
+  - Service layer for business logic
+  - Model-driven database schema
+
+- **Database**: MongoDB
+  - Document-based NoSQL structure
+  - Product schema with nested specifications
+  - Configuration model with compatibility rules
+  - Seeding scripts for development data
+  - Backup and restore procedures
+
+- **Admin Panel**: Secure management interface
+  - Separate authentication system
+  - Product management capabilities
+  - Bulk import functionality
+  - User management for administrators
+  - Activity logging for audit trail
+
+- **Infrastructure**: Docker containerization
+  - Multi-container architecture with Docker Compose
+  - Volume mounting for persistence
+  - Environment variable configuration
+  - Container health checks
+  - Production vs development configurations
+  - Network configuration between containers
+
+## Technical Patterns
+
+### Frontend Architecture
+
+1. **Component Structure**
+   - Layout components for structural elements
+   - UI components for reusable interface elements
+   - Page components for specific routes
+   - Container components for state management
+   - Presentational components for UI rendering
+   - Admin components for management interface
+
+2. **State Management**
+   - React hooks for local state
+   - Context API for global state
+   - Custom hooks for shared logic
+   - Form state with controlled components
+   - Server configuration state management
+   - Admin state for product management
+
+3. **Routing**
+   - Next.js App Router for page organization
+   - Dynamic routes for product pages
+   - Middleware for request processing
+   - Layouts for consistent page structure
+   - Loading states for data fetching
+   - Protected routes for admin panel
+
+### Backend Architecture
+
+1. **API Structure**
+   - RESTful endpoints organized by resource
+   - Controllers for request handling
+   - Models for data representation
+   - Services for business logic
+   - Middleware for cross-cutting concerns
+   - Admin-specific endpoints with authentication
+
+2. **Database Integration**
+   - MongoDB with Mongoose ODM
+   - Schema-based models
+   - Indexing for performance
+   - Validation middleware
+   - Query optimization techniques
+   - Seeding mechanism for development data
+   - Bulk import functionality for product data
+
+3. **Data Flow**
+   - Request validation
+   - Controller processing
+   - Service layer business logic
+   - Repository pattern for data access
+   - Response formatting
+   - Authentication middleware for admin routes
+
+### Database Design
+
+1. **MongoDB Collections**
+   - Products: Server products and components
+   - Categories: Product categorization hierarchy
+   - Configurations: Server configuration combinations
+   - Compatibility: Component compatibility rules
+   - Media: Product images and documents
+   - Admins: Administrative user accounts
+   - ActivityLogs: Admin action audit trail
+
+2. **Key Schema Patterns**
+   - Embedding for related data that's queried together
+   - Referencing for shared data across documents
+   - Array fields for multiple values
+   - Object fields for structured data
+   - Indexing for frequently queried fields
+   - Versioning for tracking data changes
+
+3. **Database Seeding Strategy**
+   - JSON-based seed data files
+   - Seeding scripts run during initialization
+   - Development vs production data sets
+   - Compatibility validation during seeding
+   - Realistic data model for testing
+
+### Admin Panel Architecture
+
+1. **Authentication & Authorization**
+   - JWT-based authentication for admin users
+   - Role-based access control
+   - Secure HTTP-only cookies
+   - Protected API routes
+   - Session management
+   - CSRF protection
+
+2. **Product Management**
+   - Product listing with filtering and sorting
+   - Create/Read/Update/Delete operations
+   - Form-based product editing
+   - Image upload and management
+   - Batch operations for multiple products
+   - Product category assignment
+
+3. **Bulk Import System**
+   - File upload handling
+   - CSV and JSON format support
+   - Data parsing and validation
+   - Error handling and reporting
+   - Transaction support for atomic operations
+   - Progress tracking for large imports
+   - Rollback capability for failed imports
+
+4. **User Management**
+   - Admin user creation
+   - Role and permission assignment
+   - Password management
+   - Account status control
+   - Activity history viewing
+   - Secure password reset functionality
+
+5. **Audit Logging**
+   - Action tracking for all admin operations
+   - Timestamped entries
+   - User identification
+   - Action details storage
+   - Searchable log history
+   - Exportable logs for compliance
+
+### Containerization Strategy
+
+1. **Docker Structure**
+   - Multi-container architecture
+   - Docker Compose for orchestration
+   - Container-specific Dockerfiles
+   - Volume mounting for development
+   - Network configuration for inter-container communication
+
+2. **Environment Management**
+   - Environment-specific variables
+   - Development vs production configurations
+   - Secrets management
+   - Container startup dependencies
+   - Health checks for service availability
+
+3. **Persistence Solution**
+   - Named volumes for database persistence
+   - Backup mechanisms for volumes
+   - Data migration strategies
+   - Volume mounting for code changes during development
+
+4. **Container Communication**
+   - Internal network for service discovery
+   - Port mapping for external access
+   - Service dependencies and startup order
+   - Retry mechanisms for connection failures
+
+## UI Component Architecture
+
+1. **Layout System**
+   - Container-based grid system
+   - Responsive breakpoints
+   - Component-specific layouts
+   - Consistent spacing system
+   - Separate layouts for admin and public views
+
+2. **Component Library**
+   - Button components
+   - Form elements
+   - Card components
+   - Modal dialogs
+   - Navigation elements
+   - Notification components
+   - Table components for data display
+   - Pagination components
+   - File upload components
+
+3. **Server Configuration Components**
+   - Component selection interface
+   - Configuration summary display
+   - Compatibility validation indicators
+   - Price calculation component
+   - PDF generation component
+   - Form submission component
+
+4. **Admin Interface Components**
+   - Admin layout with sidebar navigation
+   - Dashboard components with statistics
+   - Data tables with sorting and filtering
+   - Form components for product management
+   - File upload components for bulk import
+   - Modal confirmation dialogs
+   - Notification components for feedback
+   - Progress indicators for async operations
+
+## Business Model Flow
+
+1. **Server Product Discovery**
+   - Homepage with featured servers
+   - Category navigation
+   - Search functionality
+   - Filtering options
+   - Detailed product pages
+
+2. **Server Configuration Process**
+   - Component selection
+   - Compatibility checking
+   - Price calculation
+   - Configuration summary
+   - PDF generation
+   - Contact information collection
+   - Email submission
+
+3. **Admin Product Management**
+   - Secure admin login
+   - Product catalog management
+   - Individual product creation/editing
+   - Bulk product import from CSV/JSON
+   - Category management
+   - Product availability control
+   - Image management for products
+
+## Data Flow Patterns
+
+1. **Product Data Flow**
+   - Database → Backend API → Frontend → UI components
+   - Category filtering → Product listing → Product details
+   - Search query → Backend search → Filtered results
+   - Admin panel → Product creation → Database storage
+
+2. **Configuration Data Flow**
+   - Component selection → Compatibility validation → Configuration summary
+   - Configuration data → PDF generation → Email system
+   - Contact information → Email delivery → Sales team
+
+3. **Admin Data Flow**
+   - Admin credentials → Authentication → JWT token
+   - Product form → Validation → Database operation
+   - CSV/JSON upload → Parsing → Validation → Batch insert
+   - Admin action → Logging → Audit trail storage
+
+## Website Structure
+
+1. **Navigation System**
+   - Primary navigation (top)
+   - Category navigation (mega menu)
+   - Footer navigation
+   - Breadcrumb navigation
+   - Mobile navigation (hamburger menu)
+   - Admin navigation (sidebar)
+
+2. **Page Types**
+   - Homepage with hero and featured sections
+   - Product listing with filtering
+   - Product detail with specifications
+   - Server configuration page
+   - Information pages (About, Support, etc.)
+   - Admin dashboard
+   - Admin product management pages
+   - Admin import tool pages
+
+3. **UI Component Architecture**
+   - Header component
+   - Navigation components
+   - Hero component
+   - Product grid component
+   - Product card component
+   - Specification table component
+   - Configuration form component
+   - Footer component
+   - Admin layout component
+   - Product management forms
+   - Import tool components
