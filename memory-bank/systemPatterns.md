@@ -1,4 +1,4 @@
-# E-commerce Website - System Patterns
+# E-commerce Website Replication - System Patterns and Architecture
 
 ## Implemented Architecture
 
@@ -81,4 +81,53 @@ The e-commerce website follows a modern web application architecture with these 
 - useEffect for side effects and data fetching
 - Props for component communication
 - Form state for user input
-- Local component state for UI interactions 
+- Local component state for UI interactions
+
+## Website Structure
+
+### Navigation System
+- **Main Navigation:** 
+  - Tech-focused mega menu with categories: Servers, Storage, Networking, Components
+  - Secondary navigation for Corporate sections: About, Support, Configure Online
+  - User account and cart functionality in header
+- **Footer Navigation:**
+  - Four-column layout with tech categories, corporate info, support, and contact
+  - Social media links and newsletter signup
+  - Copyright and terms
+
+### Page Types
+- Home page
+- Category listing pages for server equipment
+- Product detail pages with technical specifications
+- Server configuration pages
+- Corporate information pages
+- User account pages
+- Checkout process
+- Search results page
+
+## UI Component Architecture
+
+### Tech-Specific Components
+- **ServerCard:** Displays server products with technical specifications
+- **ConfigurationTool:** Interactive component for configuring server specifications
+- **TechnicalSpecs:** Tabular display of detailed server specifications
+- **CompatibilityChecker:** Tool to verify component compatibility
+- **NetworkDiagram:** Visual configuration of network equipment
+- **StorageSizer:** Calculator for storage requirements
+
+### Tech E-commerce Patterns
+- Server product displays emphasize technical specifications over visual appeal
+- Dense information architecture with multiple filtering options
+- Expert advice components integrated with product listings
+- Technical document downloads associated with products
+- Configuration tools with dependency validation
+- Technical support information prominently displayed
+
+## Data Flow Architecture
+
+### Tech Product Data Model
+- Complex specification attributes for server equipment
+- Component compatibility relationships
+- Hierarchical categorization by technical capabilities
+- Configuration options and dependencies
+- Warranty and support package information
