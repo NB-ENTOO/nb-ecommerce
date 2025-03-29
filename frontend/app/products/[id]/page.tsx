@@ -1,7 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Layout from '../../../components/layout/Layout';
+import React from 'react';
+import { IProduct } from '@/types/product';
+import ConfigurationBuilder from '@/components/products/ConfigurationBuilder';
+import Layout from '@/components/layout/Layout';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import PriceDisplay from '@/components/common/PriceDisplay';
 import { ShoppingCart, Heart, Share2, Star } from 'lucide-react';
 import Link from 'next/link';
 
@@ -21,12 +27,211 @@ interface Product {
   stock: number;
 }
 
-export default function ProductDetail({ params }: ProductDetailProps) {
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [quantity, setQuantity] = useState(1);
+// This would normally come from an API call
+const sampleProduct: IProduct = {
+  _id: '1',
+  name: 'Dell PowerEdge R740',
+  sku: 'PE-R740-01',
+  description: 'Enterprise-class 2U rack server designed for complex workloads',
+  shortDescription: 'Powerful 2U rack server for enterprise workloads',
+  prices: [
+    { amount: 2499.99, currency: 'USD' },
+    { amount: 1999.99, currency: 'GBP' },
+    { amount: 2299.99, currency: 'EUR' },
+  ],
+  category: 'Servers',
+  subcategories: ['Rack Servers', '2U Servers'],
+  brand: 'Dell',
+  productModel: 'PowerEdge R740',
+  series: {
+    name: 'PowerEdge',
+    generation: '14th',
+    releaseDate: new Date('2023-01-01'),
+  },
+  images: [
+    {
+      url: '/images/servers/r740-front.jpg',
+      alt: 'Dell PowerEdge R740 Front View',
+      isFeatured: true,
+    },
+    {
+      url: '/images/servers/r740-rear.jpg',
+      alt: 'Dell PowerEdge R740 Rear View',
+    },
+  ],
+  stock: 10,
+  specifications: [
+    {
+      category: 'Processor',
+      key: 'CPU Model',
+      value: 'Intel Xeon Silver 4310',
+      sortOrder: 1,
+    },
+    {
+      category: 'Processor',
+      key: 'Core Count',
+      value: '12',
+      unit: 'cores',
+      sortOrder: 2,
+    },
+    {
+      category: 'Memory',
+      key: 'RAM Type',
+      value: 'DDR4 ECC',
+      sortOrder: 1,
+    },
+    {
+      category: 'Memory',
+      key: 'Base Memory',
+      value: '32',
+      unit: 'GB',
+      sortOrder: 2,
+    },
+  ],
+  configurationOptions: [
+    {
+      name: 'Processor',
+      description: 'Select your processor configuration',
+      required: true,
+      sortOrder: 1,
+      options: [
+        {
+          value: 'Intel Xeon Silver 4310 (12C/24T)',
+          description: '12 cores, 2.1GHz base, 3.3GHz turbo',
+          price: 0,
+          stock: 10,
+        },
+        {
+          value: 'Intel Xeon Gold 6330 (28C/56T)',
+          description: '28 cores, 2.0GHz base, 3.1GHz turbo',
+          price: 1200,
+          stock: 5,
+        },
+        {
+          value: 'Intel Xeon Platinum 8380 (40C/80T)',
+          description: '40 cores, 2.3GHz base, 3.4GHz turbo',
+          price: 2500,
+          stock: 2,
+        },
+      ],
+    },
+    {
+      name: 'Memory',
+      description: 'Select your memory configuration',
+      required: true,
+      sortOrder: 2,
+      options: [
+        {
+          value: '32GB (2x16GB) DDR4-3200',
+          description: 'Dual channel ECC memory',
+          price: 0,
+          stock: 15,
+        },
+        {
+          value: '64GB (4x16GB) DDR4-3200',
+          description: 'Quad channel ECC memory',
+          price: 400,
+          stock: 8,
+        },
+        {
+          value: '128GB (4x32GB) DDR4-3200',
+          description: 'Quad channel ECC memory',
+          price: 900,
+          stock: 4,
+        },
+      ],
+    },
+  ],
+  features: [
+    'Up to 2 Intel Xeon Scalable processors',
+    'Up to 24 NVMe drives',
+    'iDRAC9 with Lifecycle Controller',
+    'Hot-plug power supplies',
+  ],
+  dimensions: {
+    length: 750,
+    width: 482,
+    height: 87,
+    unit: 'mm',
+  },
+  weight: {
+    value: 21.9,
+    unit: 'kg',
+  },
+  warranty: {
+    duration: 3,
+    unit: 'years',
+    type: 'standard',
+    description: 'Next Business Day On-Site Service',
+    upgradeable: true,
+    upgradeOptions: [
+      {
+        duration: 5,
+        unit: 'years',
+        type: 'premium',
+        price: [
+          { amount: 499.99, currency: 'USD' },
+          { amount: 399.99, currency: 'GBP' },
+          { amount: 449.99, currency: 'EUR' },
+        ],
+        description: '24/7 Support with 4-hour response time',
+      },
+    ],
+  },
+  support: {
+    includedHours: 10,
+    type: 'remote',
+    description: 'Remote technical support during business hours',
+    upgradeOptions: [
+      {
+        hours: 40,
+        type: 'priority',
+        price: [
+          { amount: 299.99, currency: 'USD' },
+          { amount: 249.99, currency: 'GBP' },
+          { amount: 279.99, currency: 'EUR' },
+        ],
+        description: 'Priority support with dedicated technical account manager',
+      },
+    ],
+  },
+  customization: {
+    buildTime: 48,
+    buildToOrder: true,
+    customizationNotes: 'Custom RAID configuration available upon request',
+  },
+  shipping: {
+    international: true,
+    restrictions: ['Some countries may have import restrictions'],
+    leadTime: 5,
+    freeShipping: true,
+  },
+  priceMatch: {
+    eligible: true,
+    terms: 'Price match available for identical configurations from authorized resellers',
+  },
+  relatedProducts: ['2', '3', '4'],
+  certifications: ['CE', 'FCC', 'Energy Star'],
+  reviews: {
+    rating: 4.8,
+    count: 125,
+  },
+  seo: {
+    title: 'Dell PowerEdge R740 Server | Enterprise 2U Rack Server',
+    description: 'Dell PowerEdge R740 - Enterprise-class 2U rack server with powerful performance and flexible configuration options.',
+    keywords: ['Dell', 'PowerEdge', 'R740', 'Server', 'Rack Server', '2U'],
+  },
+  status: 'active',
+  createdAt: new Date('2023-01-01'),
+  updatedAt: new Date('2023-03-15'),
+};
 
-  useEffect(() => {
+export default function ProductPage({ params }: ProductDetailProps) {
+  const [product, setProduct] = React.useState<Product | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [quantity, setQuantity] = React.useState(1);
+
+  React.useEffect(() => {
     // In a real app, we would fetch from the API here
     // For now, we'll use a mock product
     setTimeout(() => {
@@ -45,6 +250,11 @@ export default function ProductDetail({ params }: ProductDetailProps) {
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setQuantity(parseInt(e.target.value));
+  };
+
+  const handleAddToQuote = (configuration: any) => {
+    console.log('Adding to quote:', configuration);
+    // Here you would typically make an API call to add the configuration to the user's quote
   };
 
   if (loading) {
@@ -69,138 +279,64 @@ export default function ProductDetail({ params }: ProductDetailProps) {
 
   return (
     <Layout>
-      {/* Breadcrumb */}
-      <div className="mb-6">
-        <nav className="text-sm">
-          <ol className="list-none p-0 inline-flex">
-            <li className="flex items-center">
-              <Link href="/" className="text-gray-500 hover:text-blue-600">
-                Home
-              </Link>
-              <span className="mx-2 text-gray-500">/</span>
-            </li>
-            <li className="flex items-center">
-              <Link href="/products" className="text-gray-500 hover:text-blue-600">
-                Products
-              </Link>
-              <span className="mx-2 text-gray-500">/</span>
-            </li>
-            <li className="flex items-center">
-              <Link href={`/categories/${product.category.toLowerCase()}`} className="text-gray-500 hover:text-blue-600">
-                {product.category}
-              </Link>
-              <span className="mx-2 text-gray-500">/</span>
-            </li>
-            <li className="text-gray-800 font-medium">{product.name}</li>
-          </ol>
-        </nav>
-      </div>
-
-      {/* Product Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* Product Image */}
-        <div className="bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center h-[400px]">
-          <div className="text-gray-500 text-xl">Product Image Placeholder</div>
-        </div>
-
-        {/* Product Info */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">{product.name}</h1>
-          
-          {/* Rating */}
-          <div className="flex items-center mb-4">
-            <div className="flex text-yellow-400">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} fill="currentColor" size={20} />
+      <div className="container mx-auto py-8 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Product Images and Basic Info */}
+          <div className="space-y-6">
+            <div className="aspect-square relative overflow-hidden rounded-lg border">
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                className="object-cover w-full h-full"
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+              {sampleProduct.images.map((image) => (
+                <div
+                  key={image.url}
+                  className="aspect-square relative overflow-hidden rounded-lg border cursor-pointer"
+                >
+                  <img
+                    src={image.url}
+                    alt={image.alt}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
               ))}
             </div>
-            <span className="ml-2 text-gray-600">(25 reviews)</span>
+            <Card className="p-6">
+              <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+              <div className="flex items-center gap-2 mb-4">
+                <Badge variant="secondary">{product.category}</Badge>
+                {product.stock <= 5 && (
+                  <Badge variant="warning">Low Stock</Badge>
+                )}
+              </div>
+              <p className="text-muted-foreground mb-4">
+                {product.description}
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Starting at:</span>
+                  <PriceDisplay
+                    amount={product.price}
+                    currency="USD"
+                    className="text-2xl font-bold text-primary"
+                  />
+                </div>
+                {sampleProduct.priceMatch.eligible && (
+                  <Badge variant="outline">Price Match Available</Badge>
+                )}
+              </div>
+            </Card>
           </div>
-          
-          {/* Price */}
-          <div className="mb-6">
-            <span className="text-3xl font-bold text-gray-800">${product.price.toFixed(2)}</span>
-            <span className="ml-2 text-sm text-gray-500">In stock: {product.stock} units</span>
-          </div>
-          
-          {/* Description */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-2">Description</h2>
-            <p className="text-gray-600">{product.description}</p>
-          </div>
-          
-          {/* Quantity Selector */}
-          <div className="mb-6">
-            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-2">
-              Quantity
-            </label>
-            <select
-              id="quantity"
-              name="quantity"
-              value={quantity}
-              onChange={handleQuantityChange}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-24"
-            >
-              {[...Array(10)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-4">
-            <button className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium flex items-center justify-center hover:bg-blue-700 transition duration-300">
-              <ShoppingCart className="mr-2" size={20} />
-              Add to Cart
-            </button>
-            <button className="w-12 h-12 flex items-center justify-center border border-gray-300 rounded-md hover:bg-gray-50 transition duration-300">
-              <Heart size={20} />
-            </button>
-            <button className="w-12 h-12 flex items-center justify-center border border-gray-300 rounded-md hover:bg-gray-50 transition duration-300">
-              <Share2 size={20} />
-            </button>
-          </div>
-        </div>
-      </div>
 
-      {/* Additional Info Tabs (simplified version) */}
-      <div className="mt-12">
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            <a href="#" className="border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600">
-              Specifications
-            </a>
-            <a href="#" className="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
-              Reviews
-            </a>
-            <a href="#" className="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
-              FAQs
-            </a>
-          </nav>
-        </div>
-        <div className="py-6">
-          <h3 className="text-lg font-semibold mb-4">Product Specifications</h3>
-          <div className="border-t border-gray-200">
-            <dl>
-              <div className="bg-gray-50 px-4 py-5 grid grid-cols-3 gap-4">
-                <dt className="text-sm font-medium text-gray-500">Brand</dt>
-                <dd className="text-sm text-gray-900 col-span-2">E-Shop Brand</dd>
-              </div>
-              <div className="bg-white px-4 py-5 grid grid-cols-3 gap-4">
-                <dt className="text-sm font-medium text-gray-500">Model</dt>
-                <dd className="text-sm text-gray-900 col-span-2">ES-{params.id}000</dd>
-              </div>
-              <div className="bg-gray-50 px-4 py-5 grid grid-cols-3 gap-4">
-                <dt className="text-sm font-medium text-gray-500">Warranty</dt>
-                <dd className="text-sm text-gray-900 col-span-2">1 Year Limited Warranty</dd>
-              </div>
-              <div className="bg-white px-4 py-5 grid grid-cols-3 gap-4">
-                <dt className="text-sm font-medium text-gray-500">Package Contents</dt>
-                <dd className="text-sm text-gray-900 col-span-2">Product, User Manual, Warranty Card</dd>
-              </div>
-            </dl>
+          {/* Configuration Builder */}
+          <div>
+            <ConfigurationBuilder
+              product={sampleProduct}
+              onAddToQuote={handleAddToQuote}
+            />
           </div>
         </div>
       </div>
