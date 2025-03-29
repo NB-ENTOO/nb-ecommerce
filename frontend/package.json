@@ -22,6 +22,7 @@
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.395.0",
     "next": "^14.2.4",
+    "next-auth": "^5.0.0-beta.15",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwind-merge": "^2.6.0",
@@ -29,6 +30,7 @@
     "typescript": "^5.4.5"
   },
   "devDependencies": {
+    "@types/next-auth": "^3.13.0",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4"

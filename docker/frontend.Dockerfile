@@ -1,21 +1,35 @@
-FROM node:18-alpine
+FROM node:18-alpine AS deps
 
 WORKDIR /app
 
 # Copy package files
 COPY frontend/package*.json ./
 
-# Create and use node_modules cache folder
-RUN mkdir -p /app/node_modules/.cache && chmod -R 777 /app/node_modules/.cache
-
-# Install dependencies
+# Install dependencies with cache
 RUN npm install
 
-# Copy frontend files
+# Build stage
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copy deps
+COPY --from=deps /app/node_modules ./node_modules
 COPY frontend/ .
 
-# Use development mode instead of build
+# Development stage
+FROM node:18-alpine AS runner
+
+WORKDIR /app
+
+# Copy from builder
+COPY --from=builder /app ./
+
+# Create cache folder and set permissions
+RUN mkdir -p /app/node_modules/.cache && chmod -R 777 /app/node_modules/.cache
+
+# Expose port
 EXPOSE 3000
 
-# Start the app in development mode
+# Start in development mode
 CMD ["npm", "run", "dev"]
