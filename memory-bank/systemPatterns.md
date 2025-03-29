@@ -363,112 +363,122 @@ frontend/
 
 ### Admin Panel Architecture
 
-1. **Authentication & Authorization**
-   - JWT-based authentication for admin users
-   - Role-based access control
-   - Secure HTTP-only cookies
-   - Protected API routes
-   - Session management
-   - CSRF protection
+### Overview
+The admin panel is structured as a separate section within the Next.js application, using a dedicated layout and navigation system specifically for administrative functions. It follows a modular pattern with consistent UI components and hierarchical organization.
 
-2. **Product Management**
-   - Product listing with filtering and sorting
-   - Create/Read/Update/Delete operations
-   - Form-based product editing
-   - Image upload and management
-   - Batch operations for multiple products
-   - Product category assignment
+### Admin Route Structure
+```
+/admin                     # Dashboard home
+/admin/products            # Product management
+/admin/products/[id]       # Product editing
+/admin/products/new        # Create new product
+/admin/products/import     # Bulk import
+/admin/categories          # Category management
+/admin/categories/[id]     # Category editing
+/admin/users               # User management (planned)
+/admin/settings            # System settings (planned)
+```
 
-3. **Bulk Import System**
-   - File upload handling
-   - CSV and JSON format support
-   - Data parsing and validation
-   - Error handling and reporting
-   - Transaction support for atomic operations
-   - Progress tracking for large imports
-   - Rollback capability for failed imports
+### Component Architecture
+- `AdminLayout`: Core wrapper component providing consistent layout with:
+  - Responsive sidebar navigation with collapsible menu
+  - Admin header with search, notifications, and user info
+  - Consistent page container with appropriate padding
+  - Mobile-friendly design with collapsible sidebar
+  
+- `Dashboard`: Overview component with:
+  - Statistics cards displaying key metrics
+  - Recent activity feed with status indicators
+  - System alerts section
+  - Quick action links
+  
+- `ProductsPage`: Product management component with:
+  - Search functionality with debounced input
+  - Category filtering with multi-select
+  - Sortable product table with column customization
+  - Action buttons for edit, delete operations
+  - Pagination controls
+  
+- `ProductEditPage`: Product editing component with:
+  - Comprehensive form with multiple sections
+  - Dynamic specification fields with add/remove capability
+  - Configurable options management
+  - Form validation and error handling
+  - Save, delete, and cancel actions
+  
+- `CategoriesPage`: Category management component with:
+  - Hierarchical category display with collapsible sections
+  - Category search functionality
+  - Add, edit, and delete actions
+  - Visual indication of category hierarchy
 
-4. **User Management**
-   - Admin user creation
-   - Role and permission assignment
-   - Password management
-   - Account status control
-   - Activity history viewing
-   - Secure password reset functionality
+### State Management Pattern
+- Each page component manages its own local state using React hooks
+- Search inputs use debounced state updates to prevent excessive renders
+- Form inputs use controlled components with onChange handlers
+- Complex forms use structured state objects that mirror the data model
+- Multi-step processes use finite state machines with clear state transitions
 
-5. **Audit Logging**
-   - Action tracking for all admin operations
-   - Timestamped entries
-   - User identification
-   - Action details storage
-   - Searchable log history
-   - Exportable logs for compliance
+### Form Management Pattern
+- Controlled inputs with state management
+- Field-level validation with error messages
+- Dynamic form sections that can be added/removed
+- Structured form state that mirrors the backend data model
+- Form submission handling with loading states
+- Consistent error reporting
 
-### Containerization Strategy
+### Navigation Pattern
+- Hierarchical navigation with main sections and subsections
+- Visual indication of current location
+- Mobile-responsive design with hamburger menu
+- Persistent sidebar with collapsible sections on desktop
+- Breadcrumb navigation for deep paths
 
-1. **Docker Structure**
-   - Multi-container architecture
-   - Docker Compose for orchestration
-   - Container-specific Dockerfiles
-   - Volume mounting for development
-   - Network configuration for inter-container communication
+### Authentication Pattern (Planned)
+- Role-based access control for admin routes
+- JWT integration with NextAuth
+- Protected route middleware
+- Session management with secure storage
+- Authentication state context provider
+- Login page with credentials and error handling
 
-2. **Environment Management**
-   - Environment-specific variables
-   - Development vs production configurations
-   - Secrets management
-   - Container startup dependencies
-   - Health checks for service availability
+### Data Fetching Pattern (Planned)
+- Server-side data fetching for initial page load
+- Client-side fetching for dynamic updates
+- Loading states during data fetching
+- Error handling with user feedback
+- Data caching for frequently accessed information
+- Optimistic UI updates for better user experience
 
-3. **Persistence Solution**
-   - Named volumes for database persistence
-   - Backup mechanisms for volumes
-   - Data migration strategies
-   - Volume mounting for code changes during development
+## Admin UI Component Library
 
-4. **Container Communication**
-   - Internal network for service discovery
-   - Port mapping for external access
-   - Service dependencies and startup order
-   - Retry mechanisms for connection failures
+### Core Components
+- `StatCard`: Displays key metric with icon, value, and label
+- `RecentActivity`: Shows recent system actions with timestamps
+- `SystemAlert`: Displays system notifications with severity levels
+- `AdminTable`: Reusable table component with sorting and filtering
+- `SearchBar`: Input with debounced search and clear button
+- `CategoryFilter`: Multi-select filter for categories
+- `ActionButton`: Styled button with icon for common actions
+- `PageHeader`: Consistent page header with title and actions
+- `SectionContainer`: Wrapper for logical page sections
 
-## UI Component Architecture
+### Form Components
+- `FormSection`: Grouping container for related form fields
+- `InputField`: Text input with label and error handling
+- `SelectField`: Dropdown select with options
+- `TextareaField`: Multi-line text input
+- `DynamicFieldArray`: Component for managing arrays of inputs
+- `ImageUpload`: Component for uploading and previewing images (planned)
 
-1. **Layout System**
-   - Container-based grid system
-   - Responsive breakpoints
-   - Component-specific layouts
-   - Consistent spacing system
-   - Separate layouts for admin and public views
-
-2. **Component Library**
-   - Button components
-   - Form elements
-   - Card components
-   - Modal dialogs
-   - Navigation elements
-   - Notification components
-   - Table components for data display
-   - Pagination components
-   - File upload components
-
-3. **Server Configuration Components**
-   - Component selection interface
-   - Configuration summary display
-   - Compatibility validation indicators
-   - Price calculation component
-   - PDF generation component
-   - Form submission component
-
-4. **Admin Interface Components**
-   - Admin layout with sidebar navigation
-   - Dashboard components with statistics
-   - Data tables with sorting and filtering
-   - Form components for product management
-   - File upload components for bulk import
-   - Modal confirmation dialogs
-   - Notification components for feedback
-   - Progress indicators for async operations
+### Admin Panel Styling Pattern
+- Consistent color scheme for admin interface
+- Clear visual hierarchy with typography scaling
+- Card-based layout for content organization
+- Responsive design with mobile-first approach
+- Accessibility considerations for form elements
+- Clear visual feedback for interactive elements
+- Loading states for asynchronous operations
 
 ## Business Model Flow
 
