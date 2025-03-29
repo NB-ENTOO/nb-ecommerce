@@ -13,19 +13,18 @@ interface DecodedToken {
 // Middleware to protect routes that require authentication
 export const protect = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // Get token from header
+    const authHeader = req.headers.authorization;
     let token;
 
-    // Check if token exists in headers
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-      // Get token from header
-      token = req.headers.authorization.split(' ')[1];
+    if (authHeader && authHeader.startsWith('Bearer')) {
+      token = authHeader.split(' ')[1];
     }
 
-    // Check if token exists
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'Not authorized to access this route',
+        message: 'Not authorized to access this route'
       });
     }
 
@@ -34,15 +33,14 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
       const decoded = jwt.verify(
         token,
         process.env.JWT_SECRET || 'your_jwt_secret_key_here'
-      ) as DecodedToken;
+      ) as jwt.JwtPayload;
 
-      // Find user
+      // Get user from token
       const user = await User.findById(decoded.id).select('-password');
-
       if (!user) {
         return res.status(401).json({
           success: false,
-          message: 'User not found',
+          message: 'User not found'
         });
       }
 
@@ -50,27 +48,24 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
       if (user.status !== 'Active') {
         return res.status(401).json({
           success: false,
-          message: 'Your account is inactive. Please contact an administrator.',
+          message: 'Your account is inactive'
         });
       }
 
       // Add user to request object
-      (req as any).user = {
-        id: user._id,
-        role: user.role,
-      };
-
+      (req as any).user = user;
       next();
     } catch (error) {
       return res.status(401).json({
         success: false,
-        message: 'Not authorized to access this route',
+        message: 'Not authorized to access this route'
       });
     }
   } catch (error) {
+    console.error('Auth middleware error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Server error',
+      message: 'Server error'
     });
   }
 };
@@ -88,6 +83,22 @@ export const authorize = (...roles: string[]) => {
       });
     }
 
+    next();
+  };
+};
+
+// Restrict to specific roles
+export const restrictTo = (...roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user;
+    
+    if (!user || !roles.includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to perform this action'
+      });
+    }
+    
     next();
   };
 }; 
