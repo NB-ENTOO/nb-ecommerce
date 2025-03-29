@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import Layout from '../../components/layout/Layout';
 import Link from 'next/link';
-import { Trash2, ArrowLeft, ShoppingBag, FileText, Send } from 'lucide-react';
+import { Trash2, ArrowLeft, ShoppingBag, FileText, Send, LogIn } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 // Mock cart data
 const initialCartItems = [
@@ -34,13 +36,24 @@ export default function CartPage() {
     company: '',
     comments: ''
   });
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     // Simulate loading cart data
     setTimeout(() => {
       setLoading(false);
     }, 500);
-  }, []);
+
+    // Pre-fill form with user data if authenticated
+    if (session?.user) {
+      setFormData(prev => ({
+        ...prev,
+        name: session.user.name || '',
+        email: session.user.email || ''
+      }));
+    }
+  }, [session]);
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -78,6 +91,12 @@ export default function CartPage() {
 
   const handleSubmitForm = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Redirect to login if not authenticated
+    if (status !== 'authenticated') {
+      router.push('/login?redirect=/cart');
+      return;
+    }
     
     // In a real implementation, this would send the form data and PDF to the company email
     console.log('Sending configuration to company with form data:', formData);
@@ -251,43 +270,62 @@ export default function CartPage() {
                       </div>
                     </div>
                   </div>
+                ) : status !== 'authenticated' ? (
+                  <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded mb-4">
+                    <div className="flex items-center">
+                      <LogIn className="h-6 w-6 text-blue-500 mr-4" />
+                      <div>
+                        <p className="font-bold">Please log in to send your configuration</p>
+                        <p className="text-sm">You need to be logged in to send your server configuration to our team.</p>
+                        <Link 
+                          href="/login?redirect=/cart" 
+                          className="mt-2 inline-flex items-center text-blue-700 hover:text-blue-900 font-medium"
+                        >
+                          Log in now
+                          <ArrowLeft className="ml-2 rotate-180" size={16} />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <form onSubmit={handleSubmitForm} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                         <input
                           type="text"
                           id="name"
                           name="name"
                           value={formData.name}
                           onChange={handleInputChange}
-                          required
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
                         />
                       </div>
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                         <input
                           type="email"
                           id="email"
                           name="email"
                           value={formData.email}
                           onChange={handleInputChange}
-                          required
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
                         />
                       </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                         <input
                           type="tel"
                           id="phone"
                           name="phone"
                           value={formData.phone}
                           onChange={handleInputChange}
-                          required
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
                         />
                       </div>
                       <div>
@@ -299,40 +337,31 @@ export default function CartPage() {
                           value={formData.company}
                           onChange={handleInputChange}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
                         />
                       </div>
                     </div>
                     <div>
-                      <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-1">Additional Comments</label>
+                      <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-1">Additional Information</label>
                       <textarea
                         id="comments"
                         name="comments"
-                        rows={4}
                         value={formData.comments}
                         onChange={handleInputChange}
+                        rows={4}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Any specific requirements or questions..."
+                        placeholder="Please provide any additional information or requirements for your server configuration."
                       ></textarea>
                     </div>
-                    <div className="flex items-center">
-                      <input
-                        id="terms"
-                        name="terms"
-                        type="checkbox"
-                        required
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-                        I agree to be contacted regarding my server configuration *
-                      </label>
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        className="bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 transition duration-200 flex items-center"
+                      >
+                        <Send size={18} className="mr-2" />
+                        Send Configuration
+                      </button>
                     </div>
-                    <button 
-                      type="submit"
-                      className="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-medium hover:bg-blue-700 transition duration-200 flex items-center justify-center"
-                    >
-                      <Send size={18} className="mr-2" />
-                      Send Configuration
-                    </button>
                   </form>
                 )}
               </div>

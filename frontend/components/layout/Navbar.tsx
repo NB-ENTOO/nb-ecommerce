@@ -1,10 +1,14 @@
+'use client';
+
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, User, Search, Menu, X, ChevronDown, Server, Database, Network, Cpu, HelpCircle } from 'lucide-react';
+import { ShoppingCart, User, Search, Menu, X, ChevronDown, Server, Database, Network, Cpu, HelpCircle, LogOut } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const { data: session, status } = useSession();
 
   const handleDropdownToggle = (dropdown: string) => {
     if (activeDropdown === dropdown) {
@@ -16,6 +20,10 @@ const Navbar = () => {
 
   const closeDropdowns = () => {
     setActiveDropdown(null);
+  };
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/' });
   };
 
   return (
@@ -33,9 +41,28 @@ const Navbar = () => {
                 <option>EUR (€)</option>
               </select>
             </div>
-            <Link href="/account" className="text-sm text-gray-600 hover:text-blue-500 transition-colors">
-              Account Sign In
-            </Link>
+            {status === 'authenticated' ? (
+              <div className="flex items-center space-x-4">
+                <Link href="/profile" className="text-sm text-gray-600 hover:text-blue-500 transition-colors">
+                  {session.user?.name || 'My Profile'}
+                </Link>
+                <button 
+                  onClick={handleSignOut}
+                  className="text-sm text-gray-600 hover:text-blue-500 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <Link href="/login" className="text-sm text-gray-600 hover:text-blue-500 transition-colors">
+                  Sign In
+                </Link>
+                <Link href="/register" className="text-sm text-gray-600 hover:text-blue-500 transition-colors">
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -76,6 +103,32 @@ const Navbar = () => {
                 <span className="text-xs mt-1 hidden sm:block">Quote</span>
               </div>
             </Link>
+            {status === 'authenticated' ? (
+              <>
+                <Link href="/profile" className="text-gray-700 hover:text-blue-500 transition-colors">
+                  <div className="flex flex-col items-center">
+                    <User size={22} />
+                    <span className="text-xs mt-1 hidden sm:block">Profile</span>
+                  </div>
+                </Link>
+                <button 
+                  onClick={handleSignOut}
+                  className="text-gray-700 hover:text-blue-500 transition-colors"
+                >
+                  <div className="flex flex-col items-center">
+                    <LogOut size={22} />
+                    <span className="text-xs mt-1 hidden sm:block">Logout</span>
+                  </div>
+                </button>
+              </>
+            ) : (
+              <Link href="/login" className="text-gray-700 hover:text-blue-500 transition-colors">
+                <div className="flex flex-col items-center">
+                  <User size={22} />
+                  <span className="text-xs mt-1 hidden sm:block">Sign In</span>
+                </div>
+              </Link>
+            )}
             <Link href="/cart" className="text-gray-700 hover:text-blue-500 transition-colors relative">
               <div className="flex flex-col items-center">
                 <ShoppingCart size={22} />
