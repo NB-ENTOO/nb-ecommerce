@@ -146,20 +146,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ETB Difference Section */}
+      {/* NET-BRIDGE Difference Section */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6">The ETB Difference</h2>
+              <h2 className="text-3xl font-bold mb-6">The NET-BRIDGE Difference</h2>
               <p className="text-gray-700 mb-6">
-                Founded in 2001, ETB Technologies has established itself as a leading supplier of refurbished servers, storage and network equipment, providing complete units and component parts to customers Worldwide. We've grown from a handful of staff working in a small office to a team of over 60 fantastic people, each bringing their own skills and talents to the company with a solid commitment to quality and customer care.
+                Founded in 2001, NET-BRIDGE has established itself as a leading supplier of refurbished servers, storage and network equipment, providing complete units and component parts to customers Worldwide. We've grown from a handful of staff working in a small office to a team of over 60 fantastic people, each bringing their own skills and talents to the company with a solid commitment to quality and customer care.
               </p>
               <Link
                 href="/about"
                 className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium inline-flex items-center hover:bg-blue-700 transition duration-300"
               >
-                About ETB
+                About NET-BRIDGE
               </Link>
             </div>
             <div className="bg-gray-300 h-64 rounded-lg flex items-center justify-center">
@@ -205,7 +205,7 @@ export default function Home() {
                   <div key={item} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col md:flex-row">
                     <div className="md:w-1/3 bg-gray-200 h-32 md:h-auto"></div>
                     <div className="p-4 md:w-2/3">
-                      <h3 className="font-semibold mb-2">ETB Technologies 2025 Predictions</h3>
+                      <h3 className="font-semibold mb-2">NET-BRIDGE 2025 Predictions</h3>
                       <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                         Hear what our Sales and Business Development Manager thinks 2025 has in store for the IT industry.
                       </p>
@@ -269,7 +269,7 @@ export default function Home() {
           <h5 className="text-lg font-medium mb-4">Sign up to our newsletter and be the first to know about new products and promotions</h5>
           <div className="max-w-md mx-auto flex">
             <input 
-              type="email" 
+              type="text" 
               placeholder="Enter your email"
               className="flex-grow py-3 px-4 rounded-l-md text-gray-800 focus:outline-none"
             />

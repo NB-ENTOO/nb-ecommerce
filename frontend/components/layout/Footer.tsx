@@ -1,209 +1,185 @@
 import React from 'react';
 import Link from 'next/link';
-import { Facebook, Linkedin, Mail, Phone } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white">
-      {/* Newsletter Signup Already in Main Page */}
-      
-      {/* Main Footer Content */}
+    <footer className="bg-gray-800 text-white">
+      {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-          {/* Company Logos */}
-          <div className="md:col-span-1">
-            <div className="space-y-4">
-              <Link href="/" className="text-2xl font-bold inline-block mb-4">
-                ETB Tech
-              </Link>
-              <div className="space-y-2">
-                <div className="h-8 w-32 bg-gray-700 rounded flex items-center justify-center text-xs">Dell Partner Logo</div>
-                <div className="h-8 w-32 bg-gray-700 rounded flex items-center justify-center text-xs">ISO 9001 Logo</div>
-                <div className="h-8 w-32 bg-gray-700 rounded flex items-center justify-center text-xs">ISO 27001 Logo</div>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Column 1 - About */}
+          <div>
+            <h3 className="text-lg font-bold mb-4">About NET-BRIDGE</h3>
+            <p className="text-gray-300 mb-4">
+              NET-BRIDGE is a leading supplier of refurbished servers, storage, and networking equipment, providing high-quality, cost-effective IT solutions for businesses worldwide.
+            </p>
+            <div className="flex space-x-3">
+              <a href="#" className="text-white hover:text-blue-400 transition-colors">
+                <Facebook size={20} />
+              </a>
+              <a href="#" className="text-white hover:text-blue-400 transition-colors">
+                <Twitter size={20} />
+              </a>
+              <a href="#" className="text-white hover:text-blue-400 transition-colors">
+                <Linkedin size={20} />
+              </a>
+              <a href="#" className="text-white hover:text-blue-400 transition-colors">
+                <Instagram size={20} />
+              </a>
             </div>
           </div>
-          
-          {/* Information Links */}
-          <div className="md:col-span-1">
-            <h6 className="text-lg font-bold mb-4">Information</h6>
-            <ul className="space-y-2 text-gray-300">
+
+          {/* Column 2 - Categories */}
+          <div>
+            <h3 className="text-lg font-bold mb-4">Product Categories</h3>
+            <ul className="space-y-2">
               <li>
-                <Link href="/delivery" className="hover:text-blue-400 transition duration-300">
-                  Delivery Information
-                </Link>
-              </li>
-              <li>
-                <Link href="/international" className="hover:text-blue-400 transition duration-300">
-                  International Orders
-                </Link>
-              </li>
-              <li>
-                <Link href="/returns" className="hover:text-blue-400 transition duration-300">
-                  Returns Information
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="hover:text-blue-400 transition duration-300">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-blue-400 transition duration-300">
-                  Terms & Conditions
-                </Link>
-              </li>
-              <li>
-                <Link href="/finance" className="hover:text-blue-400 transition duration-300">
-                  Finance Solutions
-                </Link>
-              </li>
-            </ul>
-          </div>
-          
-          {/* Help Links */}
-          <div className="md:col-span-1">
-            <h6 className="text-lg font-bold mb-4">Help</h6>
-            <ul className="space-y-2 text-gray-300">
-              <li>
-                <Link href="/faqs" className="hover:text-blue-400 transition duration-300">
-                  FAQs
-                </Link>
-              </li>
-              <li>
-                <Link href="/warranty" className="hover:text-blue-400 transition duration-300">
-                  Warranty & Condition
-                </Link>
-              </li>
-              <li>
-                <Link href="/price-match" className="hover:text-blue-400 transition duration-300">
-                  Price Match Promise
-                </Link>
-              </li>
-              <li>
-                <Link href="/support" className="hover:text-blue-400 transition duration-300">
-                  After Sales Support
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-blue-400 transition duration-300">
-                  Contact Us
-                </Link>
-              </li>
-            </ul>
-          </div>
-          
-          {/* About Links */}
-          <div className="md:col-span-1">
-            <h6 className="text-lg font-bold mb-4">About</h6>
-            <ul className="space-y-2 text-gray-300">
-              <li>
-                <Link href="/about" className="hover:text-blue-400 transition duration-300">
-                  About ETB
-                </Link>
-              </li>
-              <li>
-                <Link href="/sell" className="hover:text-blue-400 transition duration-300">
-                  Sell To Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/rentals" className="hover:text-blue-400 transition duration-300">
-                  Equipment Rentals
-                </Link>
-              </li>
-              <li>
-                <Link href="/news" className="hover:text-blue-400 transition duration-300">
-                  Latest News
-                </Link>
-              </li>
-              <li>
-                <Link href="/careers" className="hover:text-blue-400 transition duration-300">
-                  Careers
-                </Link>
-              </li>
-            </ul>
-          </div>
-          
-          {/* Quick Links */}
-          <div className="md:col-span-1">
-            <h6 className="text-lg font-bold mb-4">Quick Links</h6>
-            <ul className="space-y-2 text-gray-300">
-              <li>
-                <Link href="/servers" className="hover:text-blue-400 transition duration-300">
+                <Link href="/servers" className="text-gray-300 hover:text-white transition-colors">
                   Servers
                 </Link>
               </li>
               <li>
-                <Link href="/storage" className="hover:text-blue-400 transition duration-300">
-                  Storage
+                <Link href="/storage" className="text-gray-300 hover:text-white transition-colors">
+                  Storage Solutions
                 </Link>
               </li>
               <li>
-                <Link href="/networking" className="hover:text-blue-400 transition duration-300">
-                  Networking
+                <Link href="/networking" className="text-gray-300 hover:text-white transition-colors">
+                  Networking Equipment
                 </Link>
               </li>
               <li>
-                <Link href="/components" className="hover:text-blue-400 transition duration-300">
+                <Link href="/components" className="text-gray-300 hover:text-white transition-colors">
                   Components
                 </Link>
               </li>
               <li>
-                <Link href="/parts-by-server" className="hover:text-blue-400 transition duration-300">
-                  Parts By Server
+                <Link href="/workstations" className="text-gray-300 hover:text-white transition-colors">
+                  Workstations
                 </Link>
               </li>
               <li>
-                <Link href="/special-offers" className="hover:text-blue-400 transition duration-300">
+                <Link href="/special-offers" className="text-gray-300 hover:text-white transition-colors">
                   Special Offers
                 </Link>
               </li>
             </ul>
           </div>
+
+          {/* Column 3 - Customer Service */}
+          <div>
+            <h3 className="text-lg font-bold mb-4">Customer Service</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/account" className="text-gray-300 hover:text-white transition-colors">
+                  My Account
+                </Link>
+              </li>
+              <li>
+                <Link href="/orders" className="text-gray-300 hover:text-white transition-colors">
+                  Order Tracking
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-gray-300 hover:text-white transition-colors">
+                  FAQs
+                </Link>
+              </li>
+              <li>
+                <Link href="/support" className="text-gray-300 hover:text-white transition-colors">
+                  Technical Support
+                </Link>
+              </li>
+              <li>
+                <Link href="/returns" className="text-gray-300 hover:text-white transition-colors">
+                  Returns & Warranty
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                  Contact Us
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4 - Contact */}
+          <div>
+            <h3 className="text-lg font-bold mb-4">Contact Information</h3>
+            <ul className="space-y-4">
+              <li className="flex items-start">
+                <MapPin size={20} className="mr-2 text-gray-400 flex-shrink-0 mt-1" />
+                <span className="text-gray-300">
+                  NET-BRIDGE Headquarters<br />
+                  123 Server Avenue<br />
+                  Tech Park, TP1 2BC<br />
+                  United Kingdom
+                </span>
+              </li>
+              <li className="flex items-center">
+                <Phone size={20} className="mr-2 text-gray-400 flex-shrink-0" />
+                <span className="text-gray-300">+44 (0)1556 610167</span>
+              </li>
+              <li className="flex items-center">
+                <Mail size={20} className="mr-2 text-gray-400 flex-shrink-0" />
+                <span className="text-gray-300">sales@net-bridge.com</span>
+              </li>
+            </ul>
+          </div>
         </div>
         
-        {/* Contact and Review Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 border-t border-gray-800 pt-8">
-          {/* Rate ETB */}
-          <div>
-            <h6 className="text-sm font-bold mb-3 uppercase">Rate ETB</h6>
-            <div className="h-8 bg-gray-700 rounded w-32 flex items-center justify-center text-xs">Trustpilot Logo</div>
-          </div>
-          
-          {/* Follow Us */}
-          <div>
-            <h6 className="text-sm font-bold mb-3 uppercase">Follow us</h6>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-300 hover:text-blue-400 transition duration-300">
-                <Facebook />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-blue-400 transition duration-300">
-                <Linkedin />
-              </a>
+        {/* Newsletter Section */}
+        <div className="border-t border-gray-700 mt-10 pt-8">
+          <div className="text-center md:text-left md:flex md:items-center md:justify-between">
+            <div className="md:w-1/2 mb-6 md:mb-0">
+              <h3 className="text-lg font-bold mb-2">Subscribe to our Newsletter</h3>
+              <p className="text-gray-300">
+                Stay updated with new products, special offers, and technical advice.
+              </p>
             </div>
-          </div>
-          
-          {/* Contact */}
-          <div className="flex flex-col text-right">
-            <div className="flex items-center justify-end space-x-2 mb-2">
-              <span>+44 (0)1556 610167</span>
-              <Phone size={16} />
-            </div>
-            <div className="flex items-center justify-end space-x-2">
-              <span>sales@etb-tech.com</span>
-              <Mail size={16} />
+            <div className="md:w-1/2 flex">
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="flex-grow py-2 px-4 rounded-l-md text-gray-800 focus:outline-none"
+              />
+              <button className="bg-blue-600 py-2 px-4 rounded-r-md font-medium hover:bg-blue-700 transition duration-300">
+                Subscribe
+              </button>
             </div>
           </div>
         </div>
-        
-        {/* Copyright Section */}
-        <div className="mt-8 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">© ETB Technologies Ltd 2025. All Rights Reserved.</p>
-          <div className="mt-4 md:mt-0 flex space-x-4">
-            <div className="h-6 w-10 bg-gray-700 rounded"></div>
-            <div className="h-6 w-10 bg-gray-700 rounded"></div>
-            <div className="h-6 w-10 bg-gray-700 rounded"></div>
+      </div>
+      
+      {/* Bottom Footer */}
+      <div className="bg-gray-900 py-4">
+        <div className="container mx-auto px-4">
+          <div className="md:flex md:items-center md:justify-between text-center md:text-left">
+            <div className="mb-4 md:mb-0">
+              <p className="text-gray-400 text-sm">
+                &copy; {new Date().getFullYear()} NET-BRIDGE. All rights reserved.
+              </p>
+            </div>
+            <div className="flex justify-center md:justify-end space-x-4">
+              <Link href="/privacy-policy" className="text-gray-400 text-sm hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/terms-of-service" className="text-gray-400 text-sm hover:text-white transition-colors">
+                Terms of Service
+              </Link>
+              <Link href="/cookie-policy" className="text-gray-400 text-sm hover:text-white transition-colors">
+                Cookie Policy
+              </Link>
+              <Link href="/sitemap" className="text-gray-400 text-sm hover:text-white transition-colors">
+                Sitemap
+              </Link>
+            </div>
+          </div>
+          <div className="mt-4 text-center md:text-left">
+            <p className="text-gray-500 text-xs">
+              NET-BRIDGE is a registered trademark. All other trademarks are the property of their respective owners.
+            </p>
           </div>
         </div>
       </div>

@@ -45,7 +45,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold">ETB Tech</span>
+            <span className="text-2xl font-bold">NET-BRIDGE</span>
           </Link>
 
           {/* Mobile Menu Button */}
