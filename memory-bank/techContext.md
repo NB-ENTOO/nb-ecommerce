@@ -268,3 +268,15 @@ React Hook Form provides:
 - Backup and recovery procedures
 - Continuous integration setup
 - Staging environment for testing 
+
+## Known Challenges
+- Admin authentication system needs proper frontend-backend integration (NextAuth -> JWT).
+- Protected routes require middleware configuration.
+- Docker container networking requires optimization.
+- MongoDB seeding needs realistic server product data.
+- Volume mounting needed for Docker development persistence.
+- CSV/JSON import functionality for bulk product management needs implementation.
+- Strict typing with `IProduct` requires careful component alignment; assumptions about data structure can lead to type errors (as seen in `ConfigurationBuilder` refactor).
+- UI components relying on product data must be robust against potential variations or missing fields in `IProduct`.
+
+## Platform Considerations

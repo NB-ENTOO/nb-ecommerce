@@ -558,3 +558,15 @@ The admin panel is structured as a separate section within the Next.js applicati
    - Admin layout component
    - Product management forms
    - Import tool components
+
+## ConfigurationBuilder Refactoring
+
+- **Component:** `frontend/components/products/ConfigurationBuilder.tsx`
+- **Refactoring Approach:** Utilized `useReducer` hook to centralize state management for selected options, currency, total price, and validation errors.
+- **Type Alignment:** Strictly aligned the component logic, state, props, and helper functions with the structure defined in `frontend/types/product.ts` (`IProduct` interface).
+- **Removed Features:** Due to type constraints in `IProduct`, the following features were removed from the component:
+    - Calculation and display of estimated build time.
+    - UI and logic for selecting warranty upgrades.
+    - UI and logic for selecting support upgrades.
+- **Price Calculation:** Simplified to use `product.prices.base` and apply `priceModifier` from selected configuration options.
+- **Validation:** Basic validation for required options is implemented using a helper function (`validateConfigurationInternal`).

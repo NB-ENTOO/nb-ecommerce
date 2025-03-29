@@ -1,8 +1,8 @@
 import React, { useReducer, useCallback, useEffect } from 'react';
 import {
   IProduct,
-  IWarrantyUpgrade,
-  ISupportUpgrade,
+  // IWarrantyUpgrade, // Removed unused import
+  // ISupportUpgrade, // Removed unused import
   IPrice
 } from '@/types/product';
 import { Card } from '@/components/ui/card';
@@ -200,7 +200,7 @@ export default function ConfigurationBuilder({ product, onAddToQuote }: Configur
 
       {/* Configuration Options - Iterate over object */}
       {Object.entries(product.configurationOptions)
-        // .sort(...) // Cannot sort object directly. Sort keys if needed: Object.keys(product.configurationOptions).sort(...).map(key => [key, product.configurationOptions[key]])
+        // Removed commented-out sort logic
         .map(([groupKey, group]: [string, ProductConfigGroup]) => (
           <Card key={groupKey} className="p-4">
             <div className="space-y-4">
