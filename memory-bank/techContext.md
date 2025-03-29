@@ -38,7 +38,7 @@
 ## Development Environment
 
 ### Local Setup
-- Windows development environment with WSL support
+- Windows 10 (version 10.0.19045) development environment with WSL support
 - Docker Desktop for Windows
 - Node.js runtime
 - Visual Studio Code with extensions:

@@ -3,32 +3,7 @@ import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
 
-// Define custom user type to include role and password
-interface MockUser {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-}
-
-// Mock users database for demo purposes
-const users: MockUser[] = [
-  {
-    id: "1",
-    name: "Demo User",
-    email: "demo@example.com",
-    password: "password123",
-    role: "user",
-  },
-  {
-    id: "2",
-    name: "Admin User",
-    email: "admin@example.com",
-    password: "admin123",
-    role: "admin",
-  },
-];
+const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000/api';
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -43,23 +18,41 @@ const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Find user in the mock database
-        const user = users.find(user => 
-          user.email === credentials.email && 
-          user.password === credentials.password
-        );
+        try {
+          // Connect to backend auth API
+          const response = await fetch(`${backendUrl}/auth/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          });
 
-        if (user) {
-          // Only return safe user properties
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          };
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || 'Authentication failed');
+          }
+
+          if (data.success && data.token && data.user) {
+            // Return user data with token for JWT callback
+            return {
+              id: data.user.id,
+              name: data.user.name,
+              email: data.user.email,
+              role: data.user.role,
+              token: data.token,
+            };
+          }
+
+          return null;
+        } catch (error) {
+          console.error('Login error:', error);
+          return null;
         }
-        
-        return null;
       }
     }),
     GithubProvider({
@@ -68,14 +61,15 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/login',
-    error: '/login?error=true',
+    signIn: '/admin/login',
+    error: '/admin/login?error=true',
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role as string;
         token.id = user.id;
+        token.accessToken = user.token as string;
       }
       return token;
     },
@@ -83,13 +77,14 @@ const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.accessToken = token.accessToken as string;
       }
       return session;
     },
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
@@ -101,6 +96,7 @@ declare module "next-auth" {
     name?: string | null;
     email?: string | null;
     role?: string;
+    token?: string; // JWT token from backend
   }
   
   interface Session {
@@ -111,6 +107,7 @@ declare module "next-auth" {
       image?: string | null;
       role?: string;
     }
+    accessToken?: string; // Store the JWT token in the session
   }
 }
 
@@ -119,6 +116,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role?: string;
+    accessToken?: string; // JWT token from backend
   }
 }
 
