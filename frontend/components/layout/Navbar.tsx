@@ -2,13 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, User, Search, Menu, X, ChevronDown, Server, Database, Network, Cpu, HelpCircle, LogOut } from 'lucide-react';
-import { useSession, signOut } from 'next-auth/react';
+import { ShoppingCart, Search, Menu, X, ChevronDown, Server, Database, Network, Cpu, HelpCircle } from 'lucide-react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const { data: session, status } = useSession();
 
   const handleDropdownToggle = (dropdown: string) => {
     if (activeDropdown === dropdown) {
@@ -20,10 +18,6 @@ const Navbar = () => {
 
   const closeDropdowns = () => {
     setActiveDropdown(null);
-  };
-
-  const handleSignOut = async () => {
-    await signOut({ callbackUrl: '/' });
   };
 
   return (
@@ -41,28 +35,6 @@ const Navbar = () => {
                 <option>EUR (€)</option>
               </select>
             </div>
-            {status === 'authenticated' ? (
-              <div className="flex items-center space-x-4">
-                <Link href="/profile" className="text-sm text-gray-600 hover:text-blue-500 transition-colors">
-                  {session.user?.name || 'My Profile'}
-                </Link>
-                <button 
-                  onClick={handleSignOut}
-                  className="text-sm text-gray-600 hover:text-blue-500 transition-colors"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <Link href="/login" className="text-sm text-gray-600 hover:text-blue-500 transition-colors">
-                  Sign In
-                </Link>
-                <Link href="/register" className="text-sm text-gray-600 hover:text-blue-500 transition-colors">
-                  Register
-                </Link>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -103,36 +75,10 @@ const Navbar = () => {
                 <span className="text-xs mt-1 hidden sm:block">Quote</span>
               </div>
             </Link>
-            {status === 'authenticated' ? (
-              <>
-                <Link href="/profile" className="text-gray-700 hover:text-blue-500 transition-colors">
-                  <div className="flex flex-col items-center">
-                    <User size={22} />
-                    <span className="text-xs mt-1 hidden sm:block">Profile</span>
-                  </div>
-                </Link>
-                <button 
-                  onClick={handleSignOut}
-                  className="text-gray-700 hover:text-blue-500 transition-colors"
-                >
-                  <div className="flex flex-col items-center">
-                    <LogOut size={22} />
-                    <span className="text-xs mt-1 hidden sm:block">Logout</span>
-                  </div>
-                </button>
-              </>
-            ) : (
-              <Link href="/login" className="text-gray-700 hover:text-blue-500 transition-colors">
-                <div className="flex flex-col items-center">
-                  <User size={22} />
-                  <span className="text-xs mt-1 hidden sm:block">Sign In</span>
-                </div>
-              </Link>
-            )}
             <Link href="/cart" className="text-gray-700 hover:text-blue-500 transition-colors relative">
               <div className="flex flex-col items-center">
                 <ShoppingCart size={22} />
-                <span className="text-xs mt-1 hidden sm:block">Cart</span>
+                <span className="text-xs mt-1 hidden sm:block">Configure</span>
               </div>
               <span className="absolute -top-2 -right-2 bg-blue-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shadow-sm">
                 0
@@ -201,23 +147,29 @@ const Navbar = () => {
                 {activeDropdown === 'servers' && (
                   <div className="absolute left-0 top-full w-64 bg-white shadow-lg z-50 border border-gray-200">
                     <div className="p-4">
-                      <Link href="/servers/dell-rack" className="block py-2 hover:text-blue-500">
-                        Dell Rack Servers
+                      <h3 className="font-semibold mb-2">Server Form Factors</h3>
+                      <Link href="/products/servers/rack" className="block py-2 hover:text-blue-500">
+                        Rack Servers
                       </Link>
-                      <Link href="/servers/dell-tower" className="block py-2 hover:text-blue-500">
-                        Dell Tower Servers
+                      <Link href="/products/servers/tower" className="block py-2 hover:text-blue-500">
+                        Tower Servers
                       </Link>
-                      <Link href="/servers/dell-blade" className="block py-2 hover:text-blue-500">
-                        Dell Blade Servers
+                      <Link href="/products/servers/blade" className="block py-2 hover:text-blue-500">
+                        Blade Servers
                       </Link>
-                      <Link href="/servers/dell-c-class" className="block py-2 hover:text-blue-500">
-                        Dell C Class Servers
+                      
+                      <h3 className="font-semibold mt-4 mb-2">Server Brands</h3>
+                      <Link href="/products/servers/dell" className="block py-2 hover:text-blue-500">
+                        Dell EMC PowerEdge
                       </Link>
-                      <Link href="/servers/hpe" className="block py-2 hover:text-blue-500">
-                        HPE Servers
+                      <Link href="/products/servers/hpe" className="block py-2 hover:text-blue-500">
+                        HPE ProLiant
                       </Link>
-                      <Link href="/servers/supermicro" className="block py-2 hover:text-blue-500">
-                        Supermicro Servers
+                      <Link href="/products/servers/lenovo" className="block py-2 hover:text-blue-500">
+                        Lenovo ThinkSystem
+                      </Link>
+                      <Link href="/products/servers/supermicro" className="block py-2 hover:text-blue-500">
+                        Supermicro SuperServer
                       </Link>
                     </div>
                   </div>
@@ -240,23 +192,32 @@ const Navbar = () => {
                 {activeDropdown === 'storage' && (
                   <div className="absolute left-0 top-full w-64 bg-white shadow-lg z-50 border border-gray-200">
                     <div className="p-4">
-                      <Link href="/storage/powervault" className="block py-2 hover:text-blue-500">
-                        PowerVault Storage
+                      <h3 className="font-semibold mb-2">Storage Types</h3>
+                      <Link href="/products/storage/nas" className="block py-2 hover:text-blue-500">
+                        NAS Storage
                       </Link>
-                      <Link href="/storage/powerstore" className="block py-2 hover:text-blue-500">
-                        PowerStore Storage
+                      <Link href="/products/storage/san" className="block py-2 hover:text-blue-500">
+                        SAN Storage
                       </Link>
-                      <Link href="/storage/equallogic" className="block py-2 hover:text-blue-500">
-                        EqualLogic Storage Arrays
+                      <Link href="/products/storage/das" className="block py-2 hover:text-blue-500">
+                        Direct Attached Storage
                       </Link>
-                      <Link href="/storage/compellent" className="block py-2 hover:text-blue-500">
-                        Compellent Storage
+                      
+                      <h3 className="font-semibold mt-4 mb-2">Storage Brands</h3>
+                      <Link href="/products/storage/dell-emc" className="block py-2 hover:text-blue-500">
+                        Dell EMC
                       </Link>
-                      <Link href="/storage/hpe" className="block py-2 hover:text-blue-500">
+                      <Link href="/products/storage/hpe" className="block py-2 hover:text-blue-500">
                         HPE Storage
                       </Link>
-                      <Link href="/storage/hard-drives" className="block py-2 hover:text-blue-500">
-                        Hard Drives
+                      <Link href="/products/storage/netapp" className="block py-2 hover:text-blue-500">
+                        NetApp
+                      </Link>
+                      <Link href="/products/storage/qnap" className="block py-2 hover:text-blue-500">
+                        QNAP
+                      </Link>
+                      <Link href="/products/storage/synology" className="block py-2 hover:text-blue-500">
+                        Synology
                       </Link>
                     </div>
                   </div>
@@ -279,17 +240,32 @@ const Navbar = () => {
                 {activeDropdown === 'networking' && (
                   <div className="absolute left-0 top-full w-64 bg-white shadow-lg z-50 border border-gray-200">
                     <div className="p-4">
-                      <Link href="/networking/dell" className="block py-2 hover:text-blue-500">
-                        Dell Switches
+                      <h3 className="font-semibold mb-2">Network Equipment</h3>
+                      <Link href="/products/networking/switches" className="block py-2 hover:text-blue-500">
+                        Switches
                       </Link>
-                      <Link href="/networking/cisco" className="block py-2 hover:text-blue-500">
-                        Cisco Networking
+                      <Link href="/products/networking/routers" className="block py-2 hover:text-blue-500">
+                        Routers
                       </Link>
-                      <Link href="/networking/network-cards" className="block py-2 hover:text-blue-500">
-                        Network Cards
+                      <Link href="/products/networking/wireless" className="block py-2 hover:text-blue-500">
+                        Wireless
                       </Link>
-                      <Link href="/networking/transceivers" className="block py-2 hover:text-blue-500">
-                        Transceivers & Cables
+                      <Link href="/products/networking/firewalls" className="block py-2 hover:text-blue-500">
+                        Firewalls
+                      </Link>
+                      
+                      <h3 className="font-semibold mt-4 mb-2">Network Brands</h3>
+                      <Link href="/products/networking/cisco" className="block py-2 hover:text-blue-500">
+                        Cisco
+                      </Link>
+                      <Link href="/products/networking/juniper" className="block py-2 hover:text-blue-500">
+                        Juniper Networks
+                      </Link>
+                      <Link href="/products/networking/arista" className="block py-2 hover:text-blue-500">
+                        Arista Networks
+                      </Link>
+                      <Link href="/products/networking/ubiquiti" className="block py-2 hover:text-blue-500">
+                        Ubiquiti
                       </Link>
                     </div>
                   </div>
@@ -312,123 +288,125 @@ const Navbar = () => {
                 {activeDropdown === 'components' && (
                   <div className="absolute left-0 top-full w-64 bg-white shadow-lg z-50 border border-gray-200">
                     <div className="p-4">
-                      <Link href="/components/processors" className="block py-2 hover:text-blue-500">
-                        Processors / CPUs
+                      <Link href="/products/components/processors" className="block py-2 hover:text-blue-500">
+                        Processors
                       </Link>
-                      <Link href="/components/memory" className="block py-2 hover:text-blue-500">
-                        Memory (RAM)
+                      <Link href="/products/components/memory" className="block py-2 hover:text-blue-500">
+                        Memory
                       </Link>
-                      <Link href="/components/graphics-cards" className="block py-2 hover:text-blue-500">
+                      <Link href="/products/components/storage-drives" className="block py-2 hover:text-blue-500">
+                        Storage Drives
+                      </Link>
+                      <Link href="/products/components/raid-controllers" className="block py-2 hover:text-blue-500">
+                        RAID Controllers
+                      </Link>
+                      <Link href="/products/components/network-cards" className="block py-2 hover:text-blue-500">
+                        Network Cards
+                      </Link>
+                      <Link href="/products/components/gpus" className="block py-2 hover:text-blue-500">
                         Graphics Cards
                       </Link>
-                      <Link href="/components/controllers" className="block py-2 hover:text-blue-500">
-                        Controllers & Cards
+                      <Link href="/products/components/power-supplies" className="block py-2 hover:text-blue-500">
+                        Power Supplies
                       </Link>
                     </div>
                   </div>
                 )}
               </div>
-              
-              {/* Special Offers */}
-              <Link href="/special-offers" className="py-3 px-4">
-                <span className="font-medium text-red-600">Special Offers</span>
+            </div>
+            
+            {/* Corporate Links */}
+            <div className="flex">
+              <Link href="/about" className="py-3 px-4 hover:text-blue-500">
+                About
+              </Link>
+              <Link href="/support" className="py-3 px-4 hover:text-blue-500">
+                Support
+              </Link>
+              <Link href="/contact" className="py-3 px-4 hover:text-blue-500">
+                Contact
               </Link>
             </div>
           </div>
         </div>
       </div>
-
+      
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden py-4 border-t border-gray-200 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col space-y-4">
-              <div className="border-b border-gray-200 pb-2">
-                <div className="font-medium mb-2">Configure Your Own</div>
-                <div className="ml-4 flex flex-col space-y-2">
-                  <Link href="/configure/rack-servers" className="text-gray-600 hover:text-blue-500">
-                    Dell Rack Servers
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t">
+            <Link href="/" className="block px-3 py-2 text-base font-medium hover:bg-gray-50">
+              Home
+            </Link>
+            <div className="block px-3 py-2 text-base font-medium">
+              <div className="flex justify-between items-center" onClick={() => handleDropdownToggle('mobileServers')}>
+                Servers
+                <ChevronDown size={16} className={activeDropdown === 'mobileServers' ? 'transform rotate-180' : ''} />
+              </div>
+              {activeDropdown === 'mobileServers' && (
+                <div className="mt-2 pl-4 space-y-2">
+                  <Link href="/products/servers/rack" className="block py-1 text-sm">
+                    Rack Servers
                   </Link>
-                  <Link href="/configure/tower-servers" className="text-gray-600 hover:text-blue-500">
-                    Dell Tower Servers
+                  <Link href="/products/servers/tower" className="block py-1 text-sm">
+                    Tower Servers
                   </Link>
-                  <Link href="/configure/blade-servers" className="text-gray-600 hover:text-blue-500">
-                    Dell Blades & Nodes
+                  <Link href="/products/servers/blade" className="block py-1 text-sm">
+                    Blade Servers
                   </Link>
                 </div>
-              </div>
-              
-              <div className="border-b border-gray-200 pb-2">
-                <div className="font-medium mb-2">Servers</div>
-                <div className="ml-4 flex flex-col space-y-2">
-                  <Link href="/servers/dell-rack" className="text-gray-600 hover:text-blue-500">
-                    Dell Rack Servers
-                  </Link>
-                  <Link href="/servers/dell-tower" className="text-gray-600 hover:text-blue-500">
-                    Dell Tower Servers
-                  </Link>
-                  <Link href="/servers/dell-blade" className="text-gray-600 hover:text-blue-500">
-                    Dell Blade Servers
-                  </Link>
-                </div>
-              </div>
-              
-              <div className="border-b border-gray-200 pb-2">
-                <div className="font-medium mb-2">Storage</div>
-                <div className="ml-4 flex flex-col space-y-2">
-                  <Link href="/storage/powervault" className="text-gray-600 hover:text-blue-500">
-                    PowerVault Storage
-                  </Link>
-                  <Link href="/storage/powerstore" className="text-gray-600 hover:text-blue-500">
-                    PowerStore Storage
-                  </Link>
-                  <Link href="/storage/hard-drives" className="text-gray-600 hover:text-blue-500">
-                    Hard Drives
-                  </Link>
-                </div>
-              </div>
-              
-              <div className="border-b border-gray-200 pb-2">
-                <div className="font-medium mb-2">Networking</div>
-                <div className="ml-4 flex flex-col space-y-2">
-                  <Link href="/networking/dell" className="text-gray-600 hover:text-blue-500">
-                    Dell Switches
-                  </Link>
-                  <Link href="/networking/cisco" className="text-gray-600 hover:text-blue-500">
-                    Cisco Networking
-                  </Link>
-                </div>
-              </div>
-              
-              <div className="border-b border-gray-200 pb-2">
-                <div className="font-medium mb-2">Components</div>
-                <div className="ml-4 flex flex-col space-y-2">
-                  <Link href="/components/processors" className="text-gray-600 hover:text-blue-500">
-                    Processors / CPUs
-                  </Link>
-                  <Link href="/components/memory" className="text-gray-600 hover:text-blue-500">
-                    Memory (RAM)
-                  </Link>
-                </div>
-              </div>
-              
-              <Link href="/special-offers" className="font-medium text-red-600">
-                Special Offers
-              </Link>
-              
-              <div className="pt-2">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search for servers, storage and more..."
-                    className="w-full border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button className="absolute right-3 top-2 text-gray-500">
-                    <Search size={18} />
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
+            <div className="block px-3 py-2 text-base font-medium">
+              <div className="flex justify-between items-center" onClick={() => handleDropdownToggle('mobileStorage')}>
+                Storage
+                <ChevronDown size={16} className={activeDropdown === 'mobileStorage' ? 'transform rotate-180' : ''} />
+              </div>
+              {activeDropdown === 'mobileStorage' && (
+                <div className="mt-2 pl-4 space-y-2">
+                  <Link href="/products/storage/nas" className="block py-1 text-sm">
+                    NAS Storage
+                  </Link>
+                  <Link href="/products/storage/san" className="block py-1 text-sm">
+                    SAN Storage
+                  </Link>
+                  <Link href="/products/storage/das" className="block py-1 text-sm">
+                    Direct Attached Storage
+                  </Link>
+                </div>
+              )}
+            </div>
+            <div className="block px-3 py-2 text-base font-medium">
+              <div className="flex justify-between items-center" onClick={() => handleDropdownToggle('mobileNetworking')}>
+                Networking
+                <ChevronDown size={16} className={activeDropdown === 'mobileNetworking' ? 'transform rotate-180' : ''} />
+              </div>
+              {activeDropdown === 'mobileNetworking' && (
+                <div className="mt-2 pl-4 space-y-2">
+                  <Link href="/products/networking/switches" className="block py-1 text-sm">
+                    Switches
+                  </Link>
+                  <Link href="/products/networking/routers" className="block py-1 text-sm">
+                    Routers
+                  </Link>
+                  <Link href="/products/networking/wireless" className="block py-1 text-sm">
+                    Wireless
+                  </Link>
+                </div>
+              )}
+            </div>
+            <Link href="/configure" className="block px-3 py-2 text-base font-medium hover:bg-gray-50">
+              Configure Your Own
+            </Link>
+            <Link href="/about" className="block px-3 py-2 text-base font-medium hover:bg-gray-50">
+              About
+            </Link>
+            <Link href="/support" className="block px-3 py-2 text-base font-medium hover:bg-gray-50">
+              Support
+            </Link>
+            <Link href="/contact" className="block px-3 py-2 text-base font-medium hover:bg-gray-50">
+              Contact
+            </Link>
           </div>
         </div>
       )}

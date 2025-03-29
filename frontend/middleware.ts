@@ -1,23 +1,24 @@
-import { auth } from './lib/auth';
-import { NextResponse } from "next/server";
+// This file is used to handle navigation and other middleware functionalities
+// We've removed authentication requirements to make server configuration accessible to all users
+
+import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export default async function middleware(req: NextRequest) {
-  const session = await auth();
-  const isAuthenticated = !!session;
+export function middleware(request: NextRequest) {
+  const response = NextResponse.next();
   
-  // Check if the request is for the profile page
-  const isAccessingProfile = req.nextUrl.pathname.startsWith('/profile');
+  // Set security headers
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   
-  // If user is not authenticated and trying to access profile, redirect to login
-  if (!isAuthenticated && isAccessingProfile) {
-    return NextResponse.redirect(new URL('/login', req.url));
-  }
-  
-  return NextResponse.next();
+  return response;
 }
 
-// Optionally, you can configure the middleware to only run on specific paths
+// Only run middleware on specific paths
 export const config = {
-  matcher: ['/profile/:path*'],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }; 
