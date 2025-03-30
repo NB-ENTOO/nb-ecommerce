@@ -173,10 +173,10 @@ const productSchema = new Schema<IProduct>(
     },
     prices: [{
       amount: {
-        type: Number,
+      type: Number,
         required: true,
-        min: [0, 'Price must be a positive number'],
-      },
+      min: [0, 'Price must be a positive number'],
+    },
       currency: {
         type: String,
         required: true,

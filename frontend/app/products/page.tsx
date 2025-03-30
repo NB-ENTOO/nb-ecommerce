@@ -1,94 +1,101 @@
+'use client';
+
+import { useState } from 'react';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { ProductFilter } from '@/components/products/ProductFilter';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { fetchProducts, fetchCategories } from '@/services/api';
-import { IProduct } from '@/types/product';
-import { Suspense } from 'react';
 
-export default async function ProductsPage({ searchParams }: {
-  searchParams?: { [key: string]: string | string | undefined };
-}) {
-  const search = searchParams?.search as string | undefined;
-  const category = searchParams?.category as string | undefined;
-  const sort = searchParams?.sort as string | undefined;
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  inStock: boolean;
+}
 
-  const [productsData, categoriesData] = await Promise.all([
-    fetchProducts({ search, category, sort }).catch((err: unknown) => {
-      console.error('Failed to fetch products:', err);
-      return { products: [], total: 0, error: 'Failed to load products. Please try again later.' };
-    }),
-    fetchCategories().catch((err: unknown) => {
-      console.error('Failed to fetch categories:', err);
-      return { categories: ['Servers', 'Storage', 'Networking', 'Components', 'Accessories'], error: 'Failed to load categories.' };
-    })
-  ]);
+interface FilterState {
+  category: string[];
+  priceRange: [number, number];
+  inStock: boolean;
+}
 
-  // Type guard to check for error property
-  function hasError<T>(obj: T | (T & { error: string })): obj is T & { error: string } {
-    return typeof obj === 'object' && obj !== null && 'error' in obj;
-  }
+// Mock data for now - will be replaced with API call
+const mockProducts: Product[] = [
+  {
+    id: '1',
+    name: 'Dell PowerEdge R740',
+    description: 'Dual Intel Xeon Gold 6248R, 384GB RAM, 8x 1.92TB SSD',
+    price: 5999,
+    image: 'https://images.unsplash.com/photo-1597852074816-d933c7d2b988',
+    category: 'Servers',
+    inStock: true,
+  },
+  {
+    id: '2',
+    name: 'HPE ProLiant DL380 Gen10',
+    description: 'Dual Intel Xeon Gold 6230R, 256GB RAM, 4x 960GB SSD',
+    price: 4999,
+    image: 'https://images.unsplash.com/photo-1591405351990-4726e331f141',
+    category: 'Servers',
+    inStock: true,
+  },
+  {
+    id: '3',
+    name: 'NetApp AFF A400',
+    description: '24x 3.84TB NVMe SSD, Dual Controller',
+    price: 89999,
+    image: 'https://images.unsplash.com/photo-1600267204026-85c3cc8e96cd',
+    category: 'Storage',
+    inStock: false,
+  },
+  // Add more mock products as needed
+];
 
-  // Handle potential errors from fetching
-  if (hasError(productsData)) {
+export default function ProductsPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FilterState>({
+    category: [],
+    priceRange: [0, 100000],
+    inStock: false,
+  });
+
+  const filteredProducts = mockProducts.filter(product => {
+    const matchesCategory = filters.category.length === 0 || filters.category.includes(product.category);
+    const matchesPrice = product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1];
+    const matchesStock = !filters.inStock || product.inStock;
+    return matchesCategory && matchesPrice && matchesStock;
+  });
+
+  if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8">Products</h1>
-        {/* Render filter even on error */}
-        <ProductFilter
-          categories={hasError(categoriesData) ? [] : categoriesData.categories}
-          initialSearch={search}
-          initialCategory={category}
-          initialSort={sort}
-        />
-        <div className="mt-8">
-          <ErrorMessage message={productsData.error} />
-        </div>
+      <div className="flex h-96 items-center justify-center">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  // If categories fetch failed, log it but continue with fallback
-  if (hasError(categoriesData)) {
-    console.warn(categoriesData.error);
-    // Use fallback categories if fetch failed
-    const fallbackCategories = ['Servers', 'Storage', 'Networking', 'Components', 'Accessories'];
+  if (error) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-8">Products</h1>
-        <ProductFilter
-          categories={fallbackCategories}
-          initialSearch={search}
-          initialCategory={category}
-          initialSort={sort}
-        />
-        <div className="mt-8">
-          {productsData.products.length > 0 ? (
-            <ProductGrid products={productsData.products} />
-          ) : (
-            <p className="text-center text-muted-foreground">No products found matching your criteria.</p>
-          )}
-        </div>
+      <div className="container mx-auto px-4 py-8">
+        <ErrorMessage message={error} />
       </div>
     );
   }
 
-  // If both fetches were successful
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8">Products</h1>
-      <ProductFilter
-        categories={categoriesData.categories} // Now known to not have error
-        initialSearch={search}
-        initialCategory={category}
-        initialSort={sort}
-      />
-      <div className="mt-8">
-        {productsData.products.length > 0 ? (
-          <ProductGrid products={productsData.products} /> // Now known to not have error
-        ) : (
-          <p className="text-center text-muted-foreground">No products found matching your criteria.</p>
-        )}
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="mb-8 text-3xl font-bold">Products</h1>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+        <aside>
+          <ProductFilter filters={filters} onFilterChange={setFilters} />
+        </aside>
+        <main className="lg:col-span-3">
+          <ProductGrid products={filteredProducts} />
+        </main>
       </div>
     </div>
   );
