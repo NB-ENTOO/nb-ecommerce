@@ -292,3 +292,193 @@ FRONTEND_URL=http://localhost:3000
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request 
+
+## Technical Implementation Details
+
+### Frontend Architecture
+```typescript
+// Component Structure
+src/
+  ├── app/                    # Next.js 13 App Router pages
+  ├── components/             # Reusable React components
+  │   ├── ui/                # Base UI components
+  │   ├── products/          # Product-related components
+  │   ├── admin/             # Admin panel components
+  │   └── shared/            # Shared components
+  ├── lib/                   # Utility functions and helpers
+  ├── hooks/                 # Custom React hooks
+  ├── types/                 # TypeScript type definitions
+  └── styles/                # Global styles and Tailwind
+
+// Key Type Definitions
+interface IProduct {
+  id: string;
+  name: string;
+  description: string;
+  specifications: Record<string, any>;
+  category: string;
+  price: number;
+  stock: number;
+  images: string[];
+}
+
+interface ICategory {
+  id: string;
+  name: string;
+  slug: string;
+  parentId?: string;
+  children?: ICategory[];
+}
+```
+
+### Backend Architecture
+```typescript
+// API Structure
+src/
+  ├── controllers/           # Request handlers
+  ├── models/               # MongoDB schemas
+  ├── routes/               # API route definitions
+  ├── middleware/           # Custom middleware
+  ├── services/            # Business logic
+  ├── utils/               # Helper functions
+  └── types/               # TypeScript types
+
+// Key MongoDB Schemas
+interface ProductSchema {
+  name: string;
+  description: string;
+  specifications: {
+    processor?: {
+      model: string;
+      cores: number;
+      frequency: number;
+    };
+    memory?: {
+      size: number;
+      type: string;
+      speed: number;
+    };
+    storage?: Array<{
+      type: string;
+      size: number;
+      interface: string;
+    }>;
+  };
+  category: Types.ObjectId;
+  price: number;
+  stock: number;
+  images: string[];
+}
+```
+
+### Authentication Flow
+```typescript
+// NextAuth.js Configuration
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      credentials: {
+        email: { type: "email" },
+        password: { type: "password" }
+      },
+      async authorize(credentials) {
+        // Validate against backend API
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify(credentials)
+        });
+        const user = await response.json();
+        return user;
+      }
+    })
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+        token.accessToken = user.accessToken;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.role = token.role;
+      session.user.accessToken = token.accessToken;
+      return session;
+    }
+  }
+};
+```
+
+### Docker Configuration
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://backend:5000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      target: development
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/nb-ecommerce
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongodb/mongodb-community-server
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+
+volumes:
+  mongodb_data:
+```
+
+### Development Scripts
+```json
+// package.json (frontend)
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  }
+}
+
+// package.json (backend)
+{
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "test": "jest",
+    "seed:admin": "ts-node src/scripts/createAdmin.ts"
+  }
+}
+``` 
