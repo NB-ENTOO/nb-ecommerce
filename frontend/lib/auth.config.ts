@@ -1,54 +1,48 @@
-import type { NextAuthConfig } from 'next-auth';
-import GithubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
+import type { DefaultSession } from 'next-auth';
+import type { Session } from 'next-auth';
+import type { JWT } from 'next-auth/jwt';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
-// Augment next-auth types
-declare module "next-auth" {
-  interface User {
-    id: string;
-    name?: string | null;
-    email?: string | null;
-    role?: string;
-    token?: string;
-  }
-  
-  interface Session {
+interface CustomUser {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  role?: string;
+  accessToken?: string;
+}
+
+declare module 'next-auth' {
+  interface Session extends DefaultSession {
     user: {
       id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
       role?: string;
-    }
+    } & DefaultSession['user'];
     accessToken?: string;
   }
+
+  interface User extends CustomUser {}
 }
 
-// Augment jwt callback token type
-declare module "next-auth/jwt" {
-  interface JWT {
-    id: string;
-    role?: string;
-    accessToken?: string;
-  }
+interface CustomJWT extends JWT {
+  role?: string;
+  accessToken?: string;
 }
 
-const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000/api';
-
-export const authConfig: NextAuthConfig = {
+export const authConfig = {
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null;
+          throw new Error('Please provide email and password');
         }
 
         try {
+          const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000/api';
           const response = await fetch(`${backendUrl}/auth/login`, {
             method: 'POST',
             headers: {
@@ -66,53 +60,40 @@ export const authConfig: NextAuthConfig = {
             throw new Error(data.message || 'Authentication failed');
           }
 
-          if (data.success && data.token && data.user) {
-            return {
-              id: data.user.id,
-              name: data.user.name,
-              email: data.user.email,
-              role: data.user.role,
-              token: data.token,
-            };
-          }
-
-          return null;
+          return {
+            id: data.user.id,
+            name: data.user.name,
+            email: data.user.email,
+            role: data.user.role,
+            accessToken: data.accessToken,
+          };
         } catch (error) {
-          console.error('Login error:', error);
-          return null;
+          throw new Error('Authentication failed');
         }
-      }
-    }),
-    GithubProvider({
-      clientId: process.env.GITHUB_ID || "",
-      clientSecret: process.env.GITHUB_SECRET || "",
+      },
     }),
   ],
-  pages: {
-    signIn: '/admin/login',
-    error: '/admin/login?error=true',
-  },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: CustomJWT; user?: CustomUser }) {
       if (user) {
         token.role = user.role;
-        token.id = user.id;
-        token.accessToken = user.token;
+        token.accessToken = user.accessToken;
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id;
+    async session({ session, token }: { session: Session; token: CustomJWT }) {
+      if (token) {
         session.user.role = token.role;
         session.accessToken = token.accessToken;
       }
       return session;
-    }
+    },
+  },
+  pages: {
+    signIn: '/admin/login',
+    error: '/admin/login',
   },
   session: {
-    strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 24 hours
+    strategy: 'jwt' as const,
   },
-  secret: process.env.NEXTAUTH_SECRET,
 }; 

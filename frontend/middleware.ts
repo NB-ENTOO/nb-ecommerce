@@ -4,32 +4,26 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { withAuth } from 'next-auth/middleware';
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const isAdminRoute = req.nextUrl.pathname.startsWith('/admin');
-    
-    // If accessing admin routes, verify role
-    if (isAdminRoute) {
-      if (!token?.role || !['Administrator', 'Editor'].includes(token.role)) {
-        return NextResponse.redirect(new URL('/admin/login', req.url));
-      }
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req });
+  const isAdminRoute = req.nextUrl.pathname.startsWith('/admin');
+
+  if (isAdminRoute) {
+    if (!token) {
+      const loginUrl = new URL('/admin/login', req.url);
+      loginUrl.searchParams.set('callbackUrl', req.url);
+      return NextResponse.redirect(loginUrl);
     }
 
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
+    if (token.role !== 'Administrator') {
+      return NextResponse.redirect(new URL('/admin/unauthorized', req.url));
+    }
   }
-);
 
-// Protect all admin routes
+  return NextResponse.next();
+}
+
 export const config = {
-  matcher: [
-    '/admin/:path*',
-  ],
+  matcher: ['/admin/:path*']
 }; 
