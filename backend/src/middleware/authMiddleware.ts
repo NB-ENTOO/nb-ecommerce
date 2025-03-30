@@ -2,6 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
+
 // Interface for decoded JWT token
 interface DecodedToken {
   id: string;
@@ -10,76 +19,69 @@ interface DecodedToken {
   exp: number;
 }
 
-// Middleware to protect routes that require authentication
-export const protect = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // Get token from header
-    const authHeader = req.headers.authorization;
-    let token;
+// Protect routes
+export const protect = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  let token;
 
-    if (authHeader && authHeader.startsWith('Bearer')) {
-      token = authHeader.split(' ')[1];
-    }
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Not authorized to access this route'
-      });
-    }
-
+  // Check if token exists in Authorization header
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
     try {
+      // Get token from header
+      token = req.headers.authorization.split(' ')[1];
+
       // Verify token
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET || 'your_jwt_secret_key_here'
-      ) as jwt.JwtPayload;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as any;
 
-      // Get user from token
-      const user = await User.findById(decoded.id).select('-password');
-      if (!user) {
+      // Get user from the token
+      req.user = await User.findById(decoded.id).select('-password');
+
+      // Check if user exists and is active
+      if (!req.user || req.user.status !== 'Active') {
         return res.status(401).json({
           success: false,
-          message: 'User not found'
+          message: 'Not authorized, account is inactive'
         });
       }
 
-      // Check if user is active
-      if (user.status !== 'Active') {
-        return res.status(401).json({
-          success: false,
-          message: 'Your account is inactive'
-        });
-      }
-
-      // Add user to request object
-      (req as any).user = user;
       next();
     } catch (error) {
+      console.error('Auth middleware error:', error);
       return res.status(401).json({
         success: false,
-        message: 'Not authorized to access this route'
+        message: 'Not authorized, token failed'
       });
     }
-  } catch (error) {
-    console.error('Auth middleware error:', error);
-    return res.status(500).json({
+  }
+
+  if (!token) {
+    return res.status(401).json({
       success: false,
-      message: 'Server error'
+      message: 'Not authorized, no token'
     });
   }
 };
 
-// Middleware to restrict access based on user role
+// Grant access to specific roles
 export const authorize = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    // Get user from request (added by protect middleware)
-    const user = (req as any).user;
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorized'
+      });
+    }
 
-    if (!user || !roles.includes(user.role)) {
+    if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: `User role ${user?.role || 'unknown'} is not authorized to access this route`,
+        message: `User role ${req.user.role} is not authorized to access this route`
       });
     }
 
