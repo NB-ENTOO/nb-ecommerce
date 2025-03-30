@@ -120,124 +120,152 @@ The tech server solutions website follows a modern web application architecture 
 
 ## UI Component Architecture
 
-### Tech-Specific Components
-- **ServerCard:** Displays server products with technical specifications
-- **ConfigurationTool:** Interactive component for configuring server specifications
-- **TechnicalSpecs:** Tabular display of detailed server specifications
-- **CompatibilityChecker:** Tool to verify component compatibility
-- **NetworkDiagram:** Visual configuration of network equipment
-- **StorageSizer:** Calculator for storage requirements
-- **PDFGenerator:** Component to create PDF of server configurations
-- **ConfigurationRequestForm:** Form for customers to submit contact information
+### Base Components
+We use Radix UI primitives for accessible, unstyled components that we then customize with Tailwind CSS:
 
-### Tech E-commerce Patterns
-- Server product displays emphasize technical specifications over visual appeal
-- Dense information architecture with multiple filtering options
-- Expert advice components integrated with product listings
-- Technical document downloads associated with products
-- Configuration tools with dependency validation
-- Technical support information prominently displayed
-- Lead generation through PDF configurations and direct email
+1. **Button**
+   - Uses Radix UI Slot for polymorphic behavior
+   - Supports `asChild` prop for rendering as different elements
+   - Consistent styling with hover and focus states
 
-## Data Flow Architecture
+2. **LoadingSpinner**
+   - Three size variants: sm, default, lg
+   - Accessible with proper ARIA attributes
+   - Customizable with className prop
 
-### Tech Product Data Model
-- Complex specification attributes for server equipment
-- Component compatibility relationships
-- Hierarchical categorization by technical capabilities
-- Configuration options and dependencies
-- Warranty and support package information
+3. **ErrorMessage**
+   - Consistent error presentation
+   - Uses AlertCircle icon from Lucide
+   - Accessible with proper role="alert"
 
-### Configuration Request Model
-- Customer contact information
-- Server configuration details
-- Business requirements information
-- PDF generation capabilities
-- Direct email delivery to sales team
+4. **Form Controls**
+   - Slider: Range selection with dual thumbs
+   - Checkbox: Accessible with proper keyboard navigation
+   - Label: Associated with form controls via htmlFor
 
-## Frontend Architecture
+### Product Components
 
-### Core Framework
-- Next.js 13 with App Router
-- React.js for component development
-- Tailwind CSS for styling
+1. **ProductGrid**
+   - Responsive grid layout
+   - Image optimization with Next.js Image
+   - Consistent card layout for products
+
+2. **ProductFilter**
+   - Category selection with checkboxes
+   - Price range selection with slider
+   - Stock status filtering
+   - Reset functionality
+
+## State Management
+
+### Local State
+- Using React's useState for component-level state
+- Filter state managed in parent component
+- Loading and error states for async operations
+
+### Data Flow
+- Top-down props passing
+- Event handlers for state updates
+- Filter changes trigger immediate UI updates
+
+## Styling Patterns
+
+### Tailwind CSS Usage
+- Consistent spacing with margin/padding utilities
+- Responsive design with breakpoint prefixes
+- Component-specific variants with cn utility
+
+### Component Classes
+- BEM-like structure with Tailwind
+- Consistent naming conventions
+- Reusable utility classes
+
+## Error Handling
+
+### UI Error States
+- Dedicated ErrorMessage component
+- Consistent error presentation
+- Clear error messages for users
+
+### Loading States
+- Consistent loading indicators
+- Size variants for different contexts
+- Accessible loading states
+
+## Accessibility Patterns
+
+### ARIA Attributes
+- Proper roles for interactive elements
+- State indicators for loading/error
+- Keyboard navigation support
+
+### Focus Management
+- Visible focus indicators
+- Proper tab order
+- Focus trapping where needed
+
+## Image Handling
+
+### Next.js Image Component
+- Automatic optimization
+- Lazy loading
+- Proper aspect ratio maintenance
+
+## Responsive Design
+
+### Grid System
+- Mobile-first approach
+- Responsive breakpoints
+- Consistent spacing
+
+### Component Layout
+- Flexible containers
+- Adaptive sizing
+- Consistent margins/padding
+
+## Code Organization
+
+### Component Structure
+- Consistent file naming
+- Clear interface definitions
+- Proper type exports
 
 ### Directory Structure
 ```
 frontend/
-├── app/                    # Next.js App Router
-│   ├── api/                # API routes 
-│   │   └── email/          # Email submission endpoint
-│   ├── configure/          # Server configuration page
-│   ├── products/           # Product listings
-│   └── page.tsx            # Homepage
-├── components/             # Reusable components
-│   └── layout/             # Layout components
-├── lib/                    # Utility functions
-│   └── pdf.ts              # PDF generation helpers
-├── public/                 # Static assets
-└── types/                  # TypeScript type definitions
+├── src/
+│   ├── components/
+│   │   ├── ui/
+│   │   │   ├── LoadingSpinner.tsx
+│   │   │   ├── ErrorMessage.tsx
+│   │   │   ├── Button.tsx
+│   │   │   └── ...
+│   │   └── products/
+│   │       ├── ProductGrid.tsx
+│   │       └── ProductFilter.tsx
+│   └── lib/
+│       └── utils.ts
+└── app/
+    └── products/
+        └── page.tsx
 ```
 
-### Styling Approach
-- Tailwind CSS for utility-first styling
-- Mobile-first responsive design
-- Custom components for consistent UI/UX
-- Consistent color scheme based on blue/gray palette
-- Responsive megamenu for desktop navigation
-- Mobile sidebar menu for smaller screens
+## Future Considerations
+
+### Performance
+- Implement virtualization for large lists
+- Add pagination for product grid
+- Optimize image loading
 
 ### State Management
-- React hooks for local component state
-- React Context API for global state
+- Consider global state for filters
+- Implement URL-based filtering
+- Add sorting functionality
 
-## Backend Architecture
-
-### API Structure
-- Express.js based REST API
-- Node.js runtime
-- MongoDB for data persistence
-
-### API Endpoints
-```
-/api/
-├── email/          # Email submission endpoint
-├── products/       # Product management
-└── configurations/ # Server configurations
-```
-
-## Business Logic
-
-### Server Product Catalog
-- Hierarchical category structure for server products
-- Search and filtering by technical specifications
-- Detailed product views with technical specifications
-- Related products and accessories
-
-### Server Configuration System
-- Component selection and compatibility checking
-- Configuration summary and price calculation
-- PDF generation for technical specifications
-- Direct email submission to sales team
-- Confirmation screen after submission
-- No account required for configuration
-
-## Database Seeding and Docker Containerization Plans
-
-### Database Seeding Strategy
-- JSON-based seed data files
-- Seeding scripts run during initialization
-- Development vs production data sets
-- Compatibility validation during seeding
-- Realistic data model for testing
-
-### Containerization Strategy
-- Multi-container architecture with Docker Compose
-- Volume mounting for persistence
-- Environment variable configuration
-- Container health checks
-- Production vs development configurations
-- Network configuration between containers
+### API Integration
+- Add proper error boundaries
+- Implement retry logic
+- Add loading skeletons
 
 ## Architecture Overview
 
